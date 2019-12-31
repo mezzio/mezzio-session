@@ -1,17 +1,18 @@
 <?php
+
 /**
- * @see       https://github.com/zendframework/zend-expressive-session for the canonical source repository
- * @copyright Copyright (c) 2019 Zend Technologies USA Inc. (https://www.zend.com)
- * @license   https://github.com/zendframework/zend-expressive-session/blob/master/LICENSE.md New BSD License
+ * @see       https://github.com/mezzio/mezzio-session for the canonical source repository
+ * @copyright https://github.com/mezzio/mezzio-session/blob/master/COPYRIGHT.md
+ * @license   https://github.com/mezzio/mezzio-session/blob/master/LICENSE.md New BSD License
  */
 
 declare(strict_types=1);
 
-namespace Zend\Expressive\Session\Exception;
+namespace Mezzio\Session\Exception;
 
+use Mezzio\Session\InitializePersistenceIdInterface;
+use Mezzio\Session\SessionPersistenceInterface;
 use RuntimeException;
-use Zend\Expressive\Session\SessionPersistenceInterface;
-use Zend\Expressive\Session\InitializePersistenceIdInterface;
 
 final class NotInitializableException extends RuntimeException implements ExceptionInterface
 {
