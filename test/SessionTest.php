@@ -1,19 +1,20 @@
 <?php
+
 /**
- * @see       https://github.com/zendframework/zend-expressive-session for the canonical source repository
- * @copyright Copyright (c) 2017 Zend Technologies USA Inc. (https://www.zend.com)
- * @license   https://github.com/zendframework/zend-expressive-session/blob/master/LICENSE.md New BSD License
+ * @see       https://github.com/mezzio/mezzio-session for the canonical source repository
+ * @copyright https://github.com/mezzio/mezzio-session/blob/master/COPYRIGHT.md
+ * @license   https://github.com/mezzio/mezzio-session/blob/master/LICENSE.md New BSD License
  */
 
 declare(strict_types=1);
 
-namespace ZendTest\Expressive\Session;
+namespace MezzioTest\Session;
 
+use Mezzio\Session\Session;
+use Mezzio\Session\SessionCookiePersistenceInterface;
+use Mezzio\Session\SessionIdentifierAwareInterface;
+use Mezzio\Session\SessionInterface;
 use PHPUnit\Framework\TestCase;
-use Zend\Expressive\Session\Session;
-use Zend\Expressive\Session\SessionCookiePersistenceInterface;
-use Zend\Expressive\Session\SessionIdentifierAwareInterface;
-use Zend\Expressive\Session\SessionInterface;
 
 class SessionTest extends TestCase
 {

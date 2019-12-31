@@ -1,13 +1,12 @@
 docs_dir: docs/book
 site_dir: docs/html
-pages:
+nav:
     - index.md
     - Introduction: intro.md
     - Usage:
       - "Session Containers": session.md
       - "Session Persistence": persistence.md
       - "Session Middleware": middleware.md
-site_name: zend-expressive-session
+site_name: mezzio-session
 site_description: 'Sessions and session middleware for PSR-7 applications.'
-repo_url: 'https://github.com/zendframework/zend-expressive-session'
-copyright: 'Copyright (c) 2017 <a href="http://www.zend.com/">Zend Technologies USA Inc.</a>'
+repo_url: 'https://github.com/mezzio/mezzio-session'
