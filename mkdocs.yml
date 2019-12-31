@@ -2,11 +2,11 @@ docs_dir: docs/book
 site_dir: docs/html
 nav:
     - index.md
-    - Introduction: intro.md
-    - Usage:
-      - "Session Containers": session.md
-      - "Session Persistence": persistence.md
-      - "Session Middleware": middleware.md
+    - { Introduction: intro.md }
+    - { Usage: [{ 'Session Containers': session.md }, { 'Session Persistence': persistence.md }, { 'Session Middleware': middleware.md }] }
 site_name: mezzio-session
 site_description: 'Sessions and session middleware for PSR-7 applications.'
 repo_url: 'https://github.com/mezzio/mezzio-session'
+extra:
+    project: Mezzio
+    project_url: 'https://docs.mezzio.dev'
