@@ -64,7 +64,7 @@ of the CSRF token fails. Essentially, the argument is that this can be built _on
 top of_ a session package.
 
 Ocramius/PSR7Csrf could potentially be adapted later to work with
-zend-expressive-session, meaning we wouldn't need to add any such capabilities
+mezzio-session, meaning we wouldn't need to add any such capabilities
 to our own package, or even write our own package, for handling CSRF.
 
 - [x] Extract an interface for generating, validating CSRF values

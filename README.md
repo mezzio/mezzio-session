@@ -1,7 +1,7 @@
-# zend-expressive-session
+# mezzio-session
 
-[![Build Status](https://secure.travis-ci.org/zendframework/zend-expressive-session.svg?branch=master)](https://secure.travis-ci.org/zendframework/zend-expressive-session)
-[![Coverage Status](https://coveralls.io/repos/github/zendframework/zend-expressive-session/badge.svg?branch=master)](https://coveralls.io/github/zendframework/zend-expressive-session?branch=master)
+[![Build Status](https://travis-ci.org/mezzio/mezzio-session.svg?branch=master)](https://travis-ci.org/mezzio/mezzio-session)
+[![Coverage Status](https://coveralls.io/repos/github/mezzio/mezzio-session/badge.svg?branch=master)](https://coveralls.io/github/mezzio/mezzio-session?branch=master)
 
 This library provides session handling middleware for PSR-7 applications, using
 an adapter-based approach that will allow usage of ext-session, JWT, or other
@@ -20,18 +20,18 @@ approaches.
 Run the following to install this library:
 
 ```bash
-$ composer require zendframework/zend-expressive-session
+$ composer require mezzio/mezzio-session
 ```
 
 ## Documentation
 
-Documentation is [in the doc tree](docs/book/), and can be compiled using [mkdocs](http://www.mkdocs.org):
+Documentation is [in the doc tree](docs/book/), and can be compiled using [mkdocs](https://www.mkdocs.org):
 
 ```bash
 $ mkdocs build
 ```
 
-~~You may also [browse the documentation online](https://docs.zendframework.com/zend-expressive-session/).~~
+~~You may also [browse the documentation online](https://docs.mezzio.dev/mezzio-session/).~~
 
 ### Basic usage
 
@@ -46,17 +46,17 @@ You can also pipe it within routed middleware:
 
 ```php
 $app->post('/contact/process', [
-    \Zend\Expressive\Session\SessionMiddleware::class,
+    \Mezzio\Session\SessionMiddleware::class,
     \App\Contact\ProcessHandler::class
 ]);
 ```
 
 Once the middleware is in place, you can access the session container from your
 other middleware via the request attribute
-`Zend\Expressive\Session\SessionMiddleare::SESSION_ATTRIBUTE`:
+`Mezzio\Session\SessionMiddleare::SESSION_ATTRIBUTE`:
 
 ```php
-use Zend\Expressive\Session\SessionMiddleware;
+use Mezzio\Session\SessionMiddleware;
 
 $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
 $session->get('some-key');
@@ -67,10 +67,10 @@ $session->set('some-key', $value);
 ### Custom persistence
 
 To use custom persistence — e.g., a JWT-based approach — implement
-`Zend\Expressive\Session\SessionPersistenceInterface`:
+`Mezzio\Session\SessionPersistenceInterface`:
 
 ```php
-namespace Zend\Expressive\Session;
+namespace Mezzio\Session;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -94,13 +94,13 @@ interface SessionPersistenceInterface
 ```
 
 Once implemented, create an alternate factory for the
-`Zend\Expressive\Session\SessionMiddleware` service:
+`Mezzio\Session\SessionMiddleware` service:
 
 ```php
 namespace App\Session;
 
 use Psr\Container\ContainerInterface;
-use Zend\Expressive\Session\SessionMiddleware;
+use Mezzio\Session\SessionMiddleware;
 
 class SessionMiddlewareFactory
 {
@@ -120,7 +120,7 @@ file:
 return [
     'dependencies' => [
         'factories' => [
-            \Zend\Expressive\Session\SessionMiddleware::class => App\Session\SessionMiddlewareFactory::class,
+            \Mezzio\Session\SessionMiddleware::class => App\Session\SessionMiddlewareFactory::class,
         ],
     ],
 ];
