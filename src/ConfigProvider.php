@@ -1,13 +1,14 @@
 <?php
+
 /**
- * @see       https://github.com/zendframework/zend-expressive-session for the canonical source repository
- * @copyright Copyright (c) 2017 Zend Technologies USA Inc. (https://www.zend.com)
- * @license   https://github.com/zendframework/zend-expressive-session/blob/master/LICENSE.md New BSD License
+ * @see       https://github.com/mezzio/mezzio-session for the canonical source repository
+ * @copyright https://github.com/mezzio/mezzio-session/blob/master/COPYRIGHT.md
+ * @license   https://github.com/mezzio/mezzio-session/blob/master/LICENSE.md New BSD License
  */
 
 declare(strict_types=1);
 
-namespace Zend\Expressive\Session;
+namespace Mezzio\Session;
 
 class ConfigProvider
 {
@@ -21,6 +22,10 @@ class ConfigProvider
     public function getDependencies() : array
     {
         return [
+            // Legacy Zend Framework aliases
+            'aliases' => [
+                \Zend\Expressive\Session\SessionMiddleware::class => SessionMiddleware::class,
+            ],
             'factories' => [
                 SessionMiddleware::class => SessionMiddlewareFactory::class,
             ],

@@ -4,10 +4,10 @@ Session containers are the primary interface with which most application
 developers will work; they contain the data currently in the session, and allow
 you to push data to the session.
 
-All session containers implement `Zend\Expressive\Session\SessionInterface`:
+All session containers implement `Mezzio\Session\SessionInterface`:
 
 ```php
-namespace Zend\Expressive\Session;
+namespace Mezzio\Session;
 
 interface SessionInterface
 {
@@ -77,13 +77,13 @@ interface SessionInterface
 ```
 
 The default implementation, and the one you'll most likely interact with, is
-`Zend\Expressive\Session\Session`.
+`Mezzio\Session\Session`.
 
 ## Usage
 
 Session containers will typically be passed to your middleware using the
 [SessionMiddleware](middleware.md), via the
-`Zend\Expressive\Session\SessionMiddleware::SESSION_ATTRIBUTE` ("session")
+`Mezzio\Session\SessionMiddleware::SESSION_ATTRIBUTE` ("session")
 request attribute.
 
 Once you have the container, you can check for data:
@@ -121,7 +121,7 @@ $session->clear();
 ## Lazy Sessions
 
 This package provides another implementation of `SessionInterface` via
-`Zend\Expressive\Session\LazySession`. This implementation does the following:
+`Mezzio\Session\LazySession`. This implementation does the following:
 
 - It composes a [persistence](persistence.md) instance, along with the current
   request.

@@ -1,6 +1,6 @@
 # Session Persistence
 
-Session persistence within zend-expressive-session refers to one or both of the
+Session persistence within mezzio-session refers to one or both of the
 following:
 
 - Identifying session information provided by the client making the request.
@@ -11,10 +11,10 @@ In some scenarios, such as usage of JSON Web Tokens (JWT), the serialized
 session data is provided _by_ the client, and provided _to_ the client directly,
 without any server-side storage whatsoever.
 
-To describe these operations, we provide `Zend\Expressive\Session\SessionPersistenceInterface`:
+To describe these operations, we provide `Mezzio\Session\SessionPersistenceInterface`:
 
 ```php
-namespace Zend\Expressive\Session;
+namespace Mezzio\Session;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -43,4 +43,4 @@ a response containing session artifacts (a cookie, a header value, etc.).
 
 For sessions to work, _you must provide a persistence implementation_. We
 provide one such implementation using PHP's session extension via the package
-[zend-expressive-session-ext](https://github.com/zendframework/zend-expressive-session-ext).
+[mezzio-session-ext](https://github.com/mezzio/mezzio-session-ext).
