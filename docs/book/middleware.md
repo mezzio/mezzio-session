@@ -1,6 +1,6 @@
 # Session Middleware
 
-zend-expressive-session provides middleware consuming
+mezzio-session provides middleware consuming
 [PSR-7](http://www.php-fig.org/psr/psr-7/) HTTP message instances, via
 implementation of [http-interop/http-middleware](https://github.com/http-interop/http-middleware)
 interfaces.
@@ -15,7 +15,7 @@ The above two paragraphs are longer than the body of the middleware
 implementation:
 
 ```php
-namespace Zend\Expressive\Session;
+namespace Mezzio\Session;
 
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
@@ -44,12 +44,12 @@ class SessionMiddleware implements MiddlewareInterface
 
 ## Configuration
 
-This package provides a factory for `Zend\Expressive\Session\SessionMiddleware`
-via `Zend\Expressive\Session\SessionMiddlewareFactory`; this factory is
-auto-wired if you are using Expressive and the zend-component-installer Composer
+This package provides a factory for `Mezzio\Session\SessionMiddleware`
+via `Mezzio\Session\SessionMiddlewareFactory`; this factory is
+auto-wired if you are using Mezzio and the laminas-component-installer Composer
 plugin. If not, you will need to wire these into your application.
 
-The factory depends on one service: `Zend\Expressive\Session\SessionPersistenceInterface`.
+The factory depends on one service: `Mezzio\Session\SessionPersistenceInterface`.
 You will need to either wire in your persistence implementation of choice, or
 have the package providing it do so for you.
 
@@ -57,11 +57,11 @@ have the package providing it do so for you.
 
 You may pipe this middleware anywhere in your application. If you want to have
 it available anywhere, pipe it early in your application, prior to any routing.
-As an example, within Expressive, you could pipe it in the `config/pipeline.php`
+As an example, within Mezzio, you could pipe it in the `config/pipeline.php`
 file:
 
 ```php
-$app->pipe(\Zend\Expressive\Session\SessionMiddleware::class);
+$app->pipe(\Mezzio\Session\SessionMiddleware::class);
 $app->pipeRoutingMiddleware();
 ```
 
@@ -73,12 +73,12 @@ However, it's often useful to specifically include such middleware directly in
 the routed middleware pipelines, to ensure other developers are aware of its
 presence in that route's workflow.
 
-Within Expressive, you can do this when routing, in your `config/routes.php`
-file, or within a [delegator factory](https://docs.zendframework.com/zend-expressive/cookbook/autowiring-routes-and-pipelines/#delegator-factories):
+Within Mezzio, you can do this when routing, in your `config/routes.php`
+file, or within a [delegator factory](https://docs.mezzio.dev/mezzio/cookbook/autowiring-routes-and-pipelines/#delegator-factories):
 
 ```php
 $app->post('/login', [
-    \Zend\Expressive\Session\SessionMiddleware::class,
+    \Mezzio\Session\SessionMiddleware::class,
     \User\Middleware\LoginHandler::class
 ]);
 ```

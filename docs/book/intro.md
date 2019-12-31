@@ -1,4 +1,4 @@
-# zend-expressive-session
+# mezzio-session
 
 Web applications often need to perist user state between requests, and the
 generally accepted way to do so is via _sessions_. While PHP provides its own
@@ -13,7 +13,7 @@ session extension, it:
 Some projects, such as [psr-7-sessions/storageless](https://github.com/psr7-sessions/storageless),
 take a different approach, using [JSON Web Tokens](https://tools.ietf.org/html/rfc7519) (JWT).
 
-The goals of zend-expressive-session are:
+The goals of mezzio-session are:
 
 - to abstract the way users interact with session storage.
 - to abstract how sessions are persisted, to allow both standard ext-session,
@@ -26,7 +26,7 @@ The goals of zend-expressive-session are:
 Use [Composer](https://getcomposer.org) to install this package:
 
 ```bash
-$ composer require zendframework/zend-expressive-session
+$ composer require mezzio/mezzio-session
 ```
 
 However, the package is not immediately useful unless you have a persistence
@@ -34,12 +34,12 @@ adapter. If you are okay with using ext-session, you can install the following
 package as well:
 
 ```bash
-$ composer require zendframework/zend-expressive-session-ext
+$ composer require mezzio/mezzio-session-ext
 ```
 
 ## Features
 
-zend-expressive-session provides the following:
+mezzio-session provides the following:
 
 - Interfaces for:
     - session containers
@@ -66,8 +66,8 @@ Note that the goals of this package are solely focused on _session persistence_
 and _access to session data by middleware_. If you also need other features
 often related to session data, you may want to consider the following packages:
 
-- [zend-expressive-flash](https://github.com/zendframework/zend-expressive-flash): 
+- [mezzio-flash](https://github.com/mezzio/mezzio-flash): 
   provides flash message capabilities.
-- [zend-expressive-csrf](https://github.com/zendframework/zend-expressive-csrf): 
+- [mezzio-csrf](https://github.com/mezzio/mezzio-csrf): 
   provides CSRF token generation, storage, and verification, using either a
   session container, or flash messages.

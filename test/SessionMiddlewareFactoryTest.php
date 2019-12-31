@@ -1,17 +1,18 @@
 <?php
+
 /**
- * @see       https://github.com/zendframework/zend-expressive-session for the canonical source repository
- * @copyright Copyright (c) 2017 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   https://github.com/zendframework/zend-expressive-session/blob/master/LICENSE.md New BSD License
+ * @see       https://github.com/mezzio/mezzio-session for the canonical source repository
+ * @copyright https://github.com/mezzio/mezzio-session/blob/master/COPYRIGHT.md
+ * @license   https://github.com/mezzio/mezzio-session/blob/master/LICENSE.md New BSD License
  */
 
-namespace ZendTest\Expressive\Session;
+namespace MezzioTest\Session;
 
+use Mezzio\Session\SessionMiddleware;
+use Mezzio\Session\SessionMiddlewareFactory;
+use Mezzio\Session\SessionPersistenceInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
-use Zend\Expressive\Session\SessionMiddleware;
-use Zend\Expressive\Session\SessionMiddlewareFactory;
-use Zend\Expressive\Session\SessionPersistenceInterface;
 
 class SessionMiddlewareFactoryTest extends TestCase
 {
