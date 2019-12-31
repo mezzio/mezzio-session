@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Added
 
-- [#27](https://github.com/zendframework/zend-expressive-session/pull/27) adds a new interface, `Zend\Expressive\Session\SessionIdentifierAwareInterface`.
+- [zendframework/zend-expressive-session#27](https://github.com/zendframework/zend-expressive-session/pull/27) adds a new interface, `Mezzio\Session\SessionIdentifierAwareInterface`.
   `SessionInterface` implementations should also implement this interface, and
   persistence implementations should only create and consume session
   implementations that implement it. The interface defines a single method,
@@ -34,7 +34,7 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Added
 
-- [#18](https://github.com/zendframework/zend-expressive-session/pull/18) adds
+- [zendframework/zend-expressive-session#18](https://github.com/zendframework/zend-expressive-session/pull/18) adds
   support for PSR-15 middleware.
 
 ### Changed
@@ -47,11 +47,11 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Removed
 
-- [#14](https://github.com/zendframework/zend-expressive-session/pull/14) and
-  [#18](https://github.com/zendframework/zend-expressive-session/pull/18) remove
+- [zendframework/zend-expressive-session#14](https://github.com/zendframework/zend-expressive-session/pull/14) and
+  [zendframework/zend-expressive-session#18](https://github.com/zendframework/zend-expressive-session/pull/18) remove
   support for http-interop/http-middleware and http-interop/http-server-middleware.
 
-- [#5](https://github.com/zendframework/zend-expressive-session/pull/5) removes
+- [zendframework/zend-expressive-session#5](https://github.com/zendframework/zend-expressive-session/pull/5) removes
   the method `LazySession::segment()`. This method was a remnant from a previous
   refactor, and not intended for the final API. Considering that `Session` does
   not implement the method, calling it would lead to a fatal error anyways.
