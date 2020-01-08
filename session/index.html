@@ -20,7 +20,7 @@
     <div class="container">
         
         <a class="logo-link navbar-brand offset-md-2" href="https://getlaminas.org/" data-tooltip data-placement="bottom" title="Go to the Laminas homepage">
-            <img src="../img/laminas-foundation-white.svg" height="28" alt="Lamnias">
+            <img src="../img/laminas-foundation-white.svg" height="28" alt="Laminas">
         </a>
         <a class="navbar-title" href="https://docs.laminas.dev/" data-tooltip data-placement="bottom" title="Go to the Laminas Documentation">
             Documentation
@@ -36,13 +36,17 @@
             
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a href="https://getlaminas.org/about" class="nav-link">About</a>
-                </li>
-                <li class="nav-item">
-                    <a href="https://getlaminas.org/blog" class="nav-link">Blog</a>
-                </li>
-                <li class="nav-item">
-                    <a href="https://docs.laminas.dev" class="nav-link">All Docs</a>
+                    <div class="dropdown">
+                        <a class="dropdown-toggle nav-link" data-toggle="dropdown" aria-expanded="false">
+                            All Docs
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="https://docs.laminas.dev/components">Components</a>
+                            <a class="dropdown-item" href="https://docs.mezzio.dev/">Mezzio</a>
+                            <a class="dropdown-item" href="https://api-tools.getlaminas.org/docs">API Tools</a>
+                            <a class="dropdown-item" href="https://docs.laminas.dev/mvc">MVC</a>
+                        </div>
+                    </div>
                 </li>
                 <li class="nav-item">
                     <a href="https://getlaminas.org/participate" class="nav-link">Community</a>
@@ -61,20 +65,6 @@
         <h5 class="subnavigation__subtitle">Table of Contents</h5>
 
         <ul class="subnavigation__list">
-            
-
-                
-                
-
-                    
-                    
-                        
-                            <li class="subnavigation__list-item ">
-                                <a href=".." class="subnavigation__link">mezzio-session</a>
-                            </li>
-                        
-                    
-                
             
 
                 
@@ -249,161 +239,158 @@
 developers will work; they contain the data currently in the session, and allow
 you to push data to the session.</p>
 <p>All session containers implement <code>Mezzio\Session\SessionInterface</code>:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>namespace Mezzio\Session;</span>
+<pre class=codehilite><code class=language-php>namespace Mezzio\Session;
 
-<span class=x>interface SessionInterface</span>
-<span class=x>{</span>
-<span class=x>    /**</span>
-<span class=x>     * Serialize the session data to an array for storage purposes.</span>
-<span class=x>     */</span>
-<span class=x>    public function toArray() : array;</span>
+interface SessionInterface
+{
+    /**
+     * Serialize the session data to an array for storage purposes.
+     */
+    public function toArray() : array;
 
-<span class=x>    /**</span>
-<span class=x>     * Retrieve a value from the session.</span>
-<span class=x>     *</span>
-<span class=x>     * @param mixed $default Default value to return if $name does not exist.</span>
-<span class=x>     * @return mixed</span>
-<span class=x>     */</span>
-<span class=x>    public function get(string $name, $default = null);</span>
+    /**
+     * Retrieve a value from the session.
+     *
+     * @param mixed $default Default value to return if $name does not exist.
+     * @return mixed
+     */
+    public function get(string $name, $default = null);
 
-<span class=x>    /**</span>
-<span class=x>     * Whether or not the container has the given key.</span>
-<span class=x>     */</span>
-<span class=x>    public function has(string $name) : bool;</span>
+    /**
+     * Whether or not the container has the given key.
+     */
+    public function has(string $name) : bool;
 
-<span class=x>    /**</span>
-<span class=x>     * Set a value within the session.</span>
-<span class=x>     *</span>
-<span class=x>     * Values MUST be serializable in any format; we recommend ensuring the</span>
-<span class=x>     * values are JSON serializable for greatest portability.</span>
-<span class=x>     *</span>
-<span class=x>     * @param mixed $value</span>
-<span class=x>     */</span>
-<span class=x>    public function set(string $name, $value) : void;</span>
+    /**
+     * Set a value within the session.
+     *
+     * Values MUST be serializable in any format; we recommend ensuring the
+     * values are JSON serializable for greatest portability.
+     *
+     * @param mixed $value
+     */
+    public function set(string $name, $value) : void;
 
-<span class=x>    /**</span>
-<span class=x>     * Remove a value from the session.</span>
-<span class=x>     */</span>
-<span class=x>    public function unset(string $name) : void;</span>
+    /**
+     * Remove a value from the session.
+     */
+    public function unset(string $name) : void;
 
-<span class=x>    /**</span>
-<span class=x>     * Clear all values.</span>
-<span class=x>     */</span>
-<span class=x>    public function clear() : void;</span>
+    /**
+     * Clear all values.
+     */
+    public function clear() : void;
 
-<span class=x>    /**</span>
-<span class=x>     * Does the session contain changes? If not, the middleware handling</span>
-<span class=x>     * session persistence may not need to do more work.</span>
-<span class=x>     */</span>
-<span class=x>    public function hasChanged() : bool;</span>
+    /**
+     * Does the session contain changes? If not, the middleware handling
+     * session persistence may not need to do more work.
+     */
+    public function hasChanged() : bool;
 
-<span class=x>    /**</span>
-<span class=x>     * Regenerate the session.</span>
-<span class=x>     *</span>
-<span class=x>     * This can be done to prevent session fixation. When executed, it SHOULD</span>
-<span class=x>     * return a new instance; that instance should always return true for</span>
-<span class=x>     * isRegenerated().</span>
-<span class=x>     *</span>
-<span class=x>     * An example of where this WOULD NOT return a new instance is within the</span>
-<span class=x>     * shipped LazySession, where instead it would return itself, after</span>
-<span class=x>     * internally re-setting the proxied session.</span>
-<span class=x>     */</span>
-<span class=x>    public function regenerate(): SessionInterface;</span>
+    /**
+     * Regenerate the session.
+     *
+     * This can be done to prevent session fixation. When executed, it SHOULD
+     * return a new instance; that instance should always return true for
+     * isRegenerated().
+     *
+     * An example of where this WOULD NOT return a new instance is within the
+     * shipped LazySession, where instead it would return itself, after
+     * internally re-setting the proxied session.
+     */
+    public function regenerate(): SessionInterface;
 
-<span class=x>    /**</span>
-<span class=x>     * Method to determine if the session was regenerated; should return</span>
-<span class=x>     * true if the instance was produced via regenerate().</span>
-<span class=x>     */</span>
-<span class=x>    public function isRegenerated() : bool;</span>
-<span class=x>}</span>
-</pre></div></p>
+    /**
+     * Method to determine if the session was regenerated; should return
+     * true if the instance was produced via regenerate().
+     */
+    public function isRegenerated() : bool;
+}</code></pre>
 <p>The default implementation, and the one you'll most likely interact with, is
 <code>Mezzio\Session\Session</code>.</p>
 <p>Since version 1.1.0, we provide <code>Mezzio\Session\SessionIdentifierAwareInterface</code>:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>namespace Mezzio\Session;</span>
+<pre class=codehilite><code class=language-php>namespace Mezzio\Session;
 
-<span class=x>interface SessionIdentifierAwareInterface</span>
-<span class=x>{</span>
-<span class=x>    /**</span>
-<span class=x>     * Retrieve the session identifier.</span>
-<span class=x>     *</span>
-<span class=x>     * This feature was added in 1.1.0 to allow the session persistence to be</span>
-<span class=x>     * stateless. Previously, persistence implementations had to store the</span>
-<span class=x>     * session identifier between calls to initializeSessionFromRequest() and</span>
-<span class=x>     * persistSession(). When SessionInterface implementations also implement</span>
-<span class=x>     * this method, the persistence implementation no longer needs to store it.</span>
-<span class=x>     *</span>
-<span class=x>     * This method will become a part of the SessionInterface in 2.0.0.</span>
-<span class=x>     *</span>
-<span class=x>     * @since 1.1.0</span>
-<span class=x>     */</span>
-<span class=x>    public function getId() : string;</span>
-<span class=x>}</span>
-</pre></div></p>
+interface SessionIdentifierAwareInterface
+{
+    /**
+     * Retrieve the session identifier.
+     *
+     * This feature was added in 1.1.0 to allow the session persistence to be
+     * stateless. Previously, persistence implementations had to store the
+     * session identifier between calls to initializeSessionFromRequest() and
+     * persistSession(). When SessionInterface implementations also implement
+     * this method, the persistence implementation no longer needs to store it.
+     *
+     * This method will become a part of the SessionInterface in 2.0.0.
+     *
+     * @since 1.1.0
+     */
+    public function getId() : string;
+}</code></pre>
 <p>Since version 1.2.0, we provide <code>Mezzio\Session\SessionCookiePersistenceInterface</code>:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>namespace Mezzio\Session;</span>
+<pre class=codehilite><code class=language-php>namespace Mezzio\Session;
 
-<span class=x>/**</span>
-<span class=x> * Allow marking session cookies as persistent.</span>
-<span class=x> *</span>
-<span class=x> * It can be useful to mark a session as persistent: e.g., for a &quot;Remember Me&quot;</span>
-<span class=x> * feature when logging a user into your system. PHP provides this capability</span>
-<span class=x> * via ext-session with the $lifetime argument to session_set_cookie_params()</span>
-<span class=x> * as well as by the session.cookie_lifetime INI setting. The latter will set</span>
-<span class=x> * the value for all session cookies sent (or until the value is changed via</span>
-<span class=x> * an ini_set() call), while the former will only affect cookies created during</span>
-<span class=x> * the current script lifetime.</span>
-<span class=x> *</span>
-<span class=x> * Persistence engines may, of course, allow setting a global lifetime. This</span>
-<span class=x> * interface allows developers to set the lifetime programmatically. Persistence</span>
-<span class=x> * implementations are encouraged to use the value to set the cookie lifetime</span>
-<span class=x> * when creating and returning a cookie. Additionally, to ensure the cookie</span>
-<span class=x> * lifetime originally requested is honored when a session is regenerated, we</span>
-<span class=x> * recommend persistence engines to store the TTL in the session data itself,</span>
-<span class=x> * so that it can be re-sent in such scenarios.</span>
-<span class=x> */</span>
-<span class=x>interface SessionCookiePersistenceInterface</span>
-<span class=x>{</span>
-<span class=x>    const SESSION_LIFETIME_KEY = &#39;__SESSION_TTL__&#39;;</span>
+/**
+ * Allow marking session cookies as persistent.
+ *
+ * It can be useful to mark a session as persistent: e.g., for a &quot;Remember Me&quot;
+ * feature when logging a user into your system. PHP provides this capability
+ * via ext-session with the $lifetime argument to session_set_cookie_params()
+ * as well as by the session.cookie_lifetime INI setting. The latter will set
+ * the value for all session cookies sent (or until the value is changed via
+ * an ini_set() call), while the former will only affect cookies created during
+ * the current script lifetime.
+ *
+ * Persistence engines may, of course, allow setting a global lifetime. This
+ * interface allows developers to set the lifetime programmatically. Persistence
+ * implementations are encouraged to use the value to set the cookie lifetime
+ * when creating and returning a cookie. Additionally, to ensure the cookie
+ * lifetime originally requested is honored when a session is regenerated, we
+ * recommend persistence engines to store the TTL in the session data itself,
+ * so that it can be re-sent in such scenarios.
+ */
+interface SessionCookiePersistenceInterface
+{
+    const SESSION_LIFETIME_KEY = '__SESSION_TTL__';
 
-<span class=x>    /**</span>
-<span class=x>     * Define how long the session cookie should live.</span>
-<span class=x>     *</span>
-<span class=x>     * Use this value to detail to the session persistence engine how long the</span>
-<span class=x>     * session cookie should live.</span>
-<span class=x>     *</span>
-<span class=x>     * This value could be passed as the $lifetime value of</span>
-<span class=x>     * session_set_cookie_params(), or used to create an Expires or Max-Age</span>
-<span class=x>     * parameter for a session cookie.</span>
-<span class=x>     *</span>
-<span class=x>     * Since cookie lifetime is communicated by the server to the client, and</span>
-<span class=x>     * not vice versa, the value should likely be persisted in the session</span>
-<span class=x>     * itself, to ensure that session regeneration uses the same value. We</span>
-<span class=x>     * recommend using the SESSION_LIFETIME_KEY value to communicate this.</span>
-<span class=x>     *</span>
-<span class=x>     * @param int $duration Number of seconds the cookie should persist for.</span>
-<span class=x>     */</span>
-<span class=x>    public function persistSessionFor(int $duration) : void;</span>
+    /**
+     * Define how long the session cookie should live.
+     *
+     * Use this value to detail to the session persistence engine how long the
+     * session cookie should live.
+     *
+     * This value could be passed as the $lifetime value of
+     * session_set_cookie_params(), or used to create an Expires or Max-Age
+     * parameter for a session cookie.
+     *
+     * Since cookie lifetime is communicated by the server to the client, and
+     * not vice versa, the value should likely be persisted in the session
+     * itself, to ensure that session regeneration uses the same value. We
+     * recommend using the SESSION_LIFETIME_KEY value to communicate this.
+     *
+     * @param int $duration Number of seconds the cookie should persist for.
+     */
+    public function persistSessionFor(int $duration) : void;
 
-<span class=x>    /**</span>
-<span class=x>     * Determine how long the session cookie should live.</span>
-<span class=x>     *</span>
-<span class=x>     * Generally, this will return the value provided to persistFor().</span>
-<span class=x>     *</span>
-<span class=x>     * If that method has not been called, the value can return one of the</span>
-<span class=x>     * following:</span>
-<span class=x>     *</span>
-<span class=x>     * - 0 or a negative value, to indicate the cookie should be treated as a</span>
-<span class=x>     *   session cookie, and expire when the window is closed. This should be</span>
-<span class=x>     *   the default behavior.</span>
-<span class=x>     * - If persistFor() was provided during session creation or anytime later,</span>
-<span class=x>     *   the persistence engine should pull the TTL value from the session itself</span>
-<span class=x>     *   and return it here. Typically, this value should be communicated via</span>
-<span class=x>     *   the SESSION_LIFETIME_KEY value of the session.</span>
-<span class=x>     */</span>
-<span class=x>    public function getSessionLifetime() : int;</span>
-<span class=x>}</span>
-</pre></div></p>
+    /**
+     * Determine how long the session cookie should live.
+     *
+     * Generally, this will return the value provided to persistFor().
+     *
+     * If that method has not been called, the value can return one of the
+     * following:
+     *
+     * - 0 or a negative value, to indicate the cookie should be treated as a
+     *   session cookie, and expire when the window is closed. This should be
+     *   the default behavior.
+     * - If persistFor() was provided during session creation or anytime later,
+     *   the persistence engine should pull the TTL value from the session itself
+     *   and return it here. Typically, this value should be communicated via
+     *   the SESSION_LIFETIME_KEY value of the session.
+     */
+    public function getSessionLifetime() : int;
+}</code></pre>
 <p><code>Mezzio\Session\Session</code> and <code>Mezzio\Session\LazySession</code> both
 implement each of the interfaces listed above. <code>Session</code> accepts an optional
 identifier to its constructor, and will use the value of the
@@ -415,34 +402,27 @@ to seed the session cookie lifetime, if present.</p>
 <code>Mezzio\Session\SessionMiddleware::SESSION_ATTRIBUTE</code> ("session")
 request attribute.</p>
 <p>Once you have the container, you can check for data:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>if ($session-&gt;has(&#39;user&#39;)) {</span>
-<span class=x>}</span>
-</pre></div></p>
+<pre class=codehilite><code class=language-php>if ($session-&gt;has('user')) {
+}</code></pre>
 <p>and retrieve it:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>$user = $session-&gt;get(&#39;user&#39;);</span>
-</pre></div></p>
+<pre class=codehilite><code class=language-php>$user = $session-&gt;get('user');</code></pre>
 <p>You can combine those operations, by passing a default value as a second
 argument to the <code>get()</code> method:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>$user = $session-&gt;get(&#39;user&#39;, new GuestUser());</span>
-</pre></div></p>
+<pre class=codehilite><code class=language-php>$user = $session-&gt;get('user', new GuestUser());</code></pre>
 <p>If a datum is no longer relevant in the session, <code>unset()</code> it:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>$session-&gt;unset(&#39;user&#39;);</span>
-</pre></div></p>
+<pre class=codehilite><code class=language-php>$session-&gt;unset('user');</code></pre>
 <p>If none of the data is relevant, <code>clear()</code> the session:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>$session-&gt;clear();</span>
-</pre></div></p>
+<pre class=codehilite><code class=language-php>$session-&gt;clear();</code></pre>
 <h3>Persistent Sessions</h3>
 <ul>
 <li>Since 1.2.0</li>
 </ul>
 <p>You can hint to the session persistence engine how long the session should
 persist:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>$session-&gt;persistSessionFor(60 * 60 * 24 * 7); // persist for 7 days</span>
-</pre></div></p>
+<pre class=codehilite><code class=language-php>$session-&gt;persistSessionFor(60 * 60 * 24 * 7); // persist for 7 days</code></pre>
 <p>To make the session expire when the browser session is terminated (default
 behavior), use zero or a negative integer:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>$session-&gt;persistSessionFor(0); // expire data after session is over</span>
-</pre></div></p>
+<pre class=codehilite><code class=language-php>$session-&gt;persistSessionFor(0); // expire data after session is over</code></pre>
 <h2 id="lazy-sessions">Lazy Sessions</h2>
 <p>This package provides another implementation of <code>SessionInterface</code> via
 <code>Mezzio\Session\LazySession</code>. This implementation does the following:</p>
@@ -462,8 +442,7 @@ after a user has successfully logged in or out, you will generally want to
 regenerate the session in order to prevent session fixation and the attack
 vectors it invites.</p>
 <p>In those situations, call <code>regenerate()</code>:</p>
-<p> <div class=codehilite><pre><span></span><span class=x>$newSession = $session-&gt;regenerate();</span>
-</pre></div></p>
+<pre class=codehilite><code class=language-php>$newSession = $session-&gt;regenerate();</code></pre>
 <p>The interface indicates that a new instance <em>should</em> be returned. However, in
 the default usage, you will have a <code>LazySession</code> instance (as described above),
 which <em>decorates</em> the underlying session storage. This is done for two reasons:</p>
@@ -544,20 +523,6 @@ deep in your application, but still have the data persisted correctly.</p>
                     
                         
                             <li class="subnavigation__list-item ">
-                                <a href=".." class="subnavigation__link">mezzio-session</a>
-                            </li>
-                        
-                    
-                
-            
-
-                
-                
-
-                    
-                    
-                        
-                            <li class="subnavigation__list-item ">
                                 <a href="../intro/" class="subnavigation__link">Introduction</a>
                             </li>
                         
@@ -622,9 +587,10 @@ deep in your application, but still have the data persisted correctly.</p>
             <div class="col-md-7 offset-md-2">
                 <h5>Laminas</h5>
                 <ul>
-                    <li>Laminas Project <a href="https://getlaminas.org/">Components and MVC for Enterprise Applications</a></li>
-                    <li>Mezzio <a href="https://docs.mezzio.dev/">PSR-15 Middleware in Minutes</a></li>
-                    <li>Laminas API Tools: <a href="https://api-tools.getlaminas.org/">Build RESTful APIs in minutes</a></li>
+                    <li>Laminas Project <a href="https://getlaminas.org/">The new foundation for the community-supported, open source continuation of Zend Framework</a></li>
+                    <li>Laminas Components and MVC <a href="https://docs.laminas.dev/">Components and MVC for enterprise applications</a></li>
+                    <li>Mezzio <a href="https://docs.mezzio.dev/">PSR-15 middleware in minutes</a></li>
+                    <li>Laminas API Tools <a href="https://api-tools.getlaminas.org/">Build RESTful APIs in minutes</a></li>
                 </ul>
             </div>
         </div>
@@ -661,7 +627,7 @@ deep in your application, but still have the data persisted correctly.</p>
                 <h4 class="footer__headline">License</h4>
                 <p>
                     Code licensed under <a
-                        href="https://github.com/mezzio/mezzio-session//blob/master/LICENSE.md">BSD 3-Clause</a>.
+                        href="https://github.com/mezzio/mezzio-session/blob/master/LICENSE.md">BSD 3-Clause</a>.
                 </p>
             </div>
 
@@ -670,8 +636,8 @@ deep in your application, but still have the data persisted correctly.</p>
                 <h4 class="footer__headline">Copyright</h4>
                 <p>
                     <!--Built with love by the Laminas team with the help of our
-                    <a href="https://github.com/mezzio/mezzio-session//graphs/contributors">contributors</a>.<br>-->
-                    &copy; 2019-2019 by <a href="https://getlaminas.org/">The Laminas Project</a>.
+                    <a href="https://github.com/mezzio/mezzio-session/graphs/contributors">contributors</a>.<br>-->
+                    &copy; 2019-2020 by <a href="https://getlaminas.org/">The Laminas Project</a>.
                 </p>
             </div>
         </div>

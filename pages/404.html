@@ -6,10 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sessions and session middleware for PSR-7 applications.">  
-    <link rel="canonical" href="https://docs.mezzio.dev/persistence/">
     <link rel="shortcut icon" href="/img/trademark-laminas-foundation-rgb.svg">
 
-    <title>Session Persistence - mezzio-session - Laminas Docs</title>
+    <title>mezzio-session - Laminas Docs</title>
 
     <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -59,7 +58,7 @@
                     
     <div class="subnavigation hidden-print">
         <h4 class="subnavigation__title">
-            <a href="..">mezzio-session</a>
+            <a href="../.">mezzio-session</a>
         </h4>
 
         <h5 class="subnavigation__subtitle">Table of Contents</h5>
@@ -98,8 +97,8 @@
 
                                     
                                         
-    <li class="subnavigation__list-item subnavigation__list-item--active">
-        <a href="./" class="subnavigation__link">Session Persistence</a>
+    <li class="subnavigation__list-item ">
+        <a href="../persistence/" class="subnavigation__link">Session Persistence</a>
     </li>
 
                                     
@@ -174,199 +173,21 @@
         <div class="row">
             <div class="col-md-2 col-sm-12">
                 
-    
-
-    
-    
-        <div class="toc">
-            <h6 class="toc__headline">On this page</h6>
-            <ul class="toc__list">
-                
-                    <li class="toc__entry">
-                        <a href="#session-identifiers" class="toc__link">Session identifiers</a>
-                    </li>
-                
-                    <li class="toc__entry">
-                        <a href="#persistent-sessions" class="toc__link">Persistent sessions</a>
-                    </li>
-                
-            </ul>
-        </div>
-    
-
             </div>
             <div class="col-md-7 col-sm-12 content" role="main" data-spy="scroll" data-target=".toc">
                 
-                    <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
-        
-            <li class="breadcrumb-item"><a href="">Overview</a></li>
 
-            
-                <li class="breadcrumb-item"><a href="..">mezzio-session</a></li>
+<h1 class="content__title">404</h1>
+<blockquote>
+    <h3>Something went wrong!</h3>
+    <p>
+        We're sorry, but the page you are looking for does not exist.
+    </p>
+</blockquote>
 
-                
-                    
-                        
-                        
-                            <li class="breadcrumb-item">Usage</li>
-                        
-                    
-                
-
-                <li class="breadcrumb-item active" aria-current="page">Session Persistence</li>
-            
-        
-    </ol>
-</nav>
+<a href="../." class="btn btn-default" role="button">Go to homepage</a>
 
 
-
-
-
-
-    
-    
-        <h2 class="chapter__headline">Usage</h2>
-    
-
-    <h1 id="session-persistence">Session Persistence</h1>
-<p>Session persistence within mezzio-session refers to one or both of the
-following:</p>
-<ul>
-<li>Identifying session information provided by the client making the request.</li>
-<li>Storing session data for access on subsequent requests.</li>
-<li>Providing session information to the client making the request.</li>
-</ul>
-<p>In some scenarios, such as usage of JSON Web Tokens (JWT), the serialized
-session data is provided <em>by</em> the client, and provided <em>to</em> the client directly,
-without any server-side storage whatsoever.</p>
-<p>To describe these operations, we provide <code>Mezzio\Session\SessionPersistenceInterface</code>:</p>
-<pre class=codehilite><code class=language-php>namespace Mezzio\Session;
-
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-
-interface SessionPersistenceInterface
-{
-    /**
-     * Generate a session data instance based on the request.
-     */
-    public function initializeSessionFromRequest(ServerRequestInterface $request) : SessionInterface;
-
-    /**
-     * Persist the session data instance.
-     *
-     * Persists the session data, returning a response instance with any
-     * artifacts required to return to the client.
-     */
-    public function persistSession(SessionInterface $session, ResponseInterface $response) : ResponseInterface;
-}</code></pre>
-<p>Session initialization pulls data from the request (a cookie, a header value,
-etc.) in order to produce a session container. Session persistence pulls data
-from the session container, does something with it, and then optionally provides
-a response containing session artifacts (a cookie, a header value, etc.).</p>
-<p>For sessions to work, <em>you must provide a persistence implementation</em>. We
-provide one such implementation using PHP's session extension via the package
-<a href="https://github.com/mezzio/mezzio-session-ext">mezzio-session-ext</a>.</p>
-<h2 id="session-identifiers">Session identifiers</h2>
-<p>Typically, the session identifier will be retrieved from the request (usually
-via a cookie), and a new identifier created if none was discovered.</p>
-<p>During persistence, if an existing session's contents have changed, or
-<code>regenerateId()</code> was called on the session, the persistence implementation
-becomes responsible for:</p>
-<ul>
-<li>Removing the original session.</li>
-<li>Generating a new identifier for the session.</li>
-</ul>
-<p>In all situations, it then needs to store the session data in such a way that a
-later lookup by the current identifier will retrieve that data.</p>
-<p>Prior to version 1.1.0, persistence engines had two ways to determine what the
-original session identifier was when it came time to regenerate or persist a
-session:</p>
-<ul>
-<li>Store the identifier as a property of the persistence implementation.</li>
-<li>Store the identifier in the session data under a "magic" key (e.g.,
-  <code>__SESSION_ID__</code>).</li>
-</ul>
-<p>The first approach is problematic when using mezzio-session in an async
-environment such as <a href="https://swoole.co.uk">Swoole</a> or
-<a href="https://reactphp.org">ReactPHP</a>, as the same persistence instance may be used
-by several simultaneous requests. As such, version 1.1.0 introduces a new
-interface for <code>Mezzio\Session\SessionInterface</code> implementations to use:
-<code>Mezzio\Session\SessionIdentifierAwareInterface</code>. This interface
-defines a single method, <code>getId()</code>; implementations can thus store the
-identifier internally, and, when it comes time to store the session data,
-persistence implementations can query that method in order to retrieve the
-session identifier.</p>
-<p>Considering that persistence implementations also <em>create</em> the session instance,
-we recommend that implementations only create instances that implement the
-<code>SessionIdentifierAwareInterface</code> going forward in order to make themselves
-async compatible.</p>
-<h2 id="persistent-sessions">Persistent sessions</h2>
-<ul>
-<li>Since 1.2.0.</li>
-</ul>
-<p>If your persistence implementation supports persistent sessions &mdash; for
-example, by setting an <code>Expires</code> or <code>Max-Age</code> cookie directive &mdash; then you
-can opt to globally set a default session duration, or allow developers to hint
-a desired session duration via the session container using
-<code>SessionContainerPersistenceInterface::persistSessionFor()</code>.</p>
-<p>Implementations SHOULD honor the value of <code>SessionContainerPersistenceInterface::getSessionLifetime()</code>
-when persisting the session data. This could mean either or both of the
-following:</p>
-<ul>
-<li>Ensuring that the session data will not be purged until after the specified
-  TTL value.</li>
-<li>Setting an <code>Expires</code> or <code>Max-Age</code> cookie directive.</li>
-</ul>
-<p>In each case, the persistence engine should query the <code>Session</code> instance for a
-TTL value:</p>
-<pre class=codehilite><code class=language-php>$ttl = $session instanceof SessionContainerPersistenceInterface
-    ? $session-&gt;getSessionLifetime()
-    : $defaultLifetime; // likely 0, to indicate automatic expiry</code></pre>
-<p><code>getSessionLifetime()</code> returns an <code>integer</code> value indicating the number of
-seconds the session should persist.</p>
-
-
-
-
-    <nav>
-    <ul class="page-nav hidden-print">
-
-        
-        <li class="page-nav__item">
-            
-                <a rel="prev" class="page-nav__link page-nav__link--prev" href="../session/">
-                    <i class="fa fa-chevron-left"></i> Previous
-                </a>
-            
-        </li>
-
-        
-        <li class="page-nav__item">
-            
-                <a rel="next" class="page-nav__link page-nav__link--next" href="../middleware/">
-                    Next <i class="fa fa-chevron-right"></i>
-                </a>
-            
-        </li>
-    </ul>
-</nav>
-
-
-
-
-    <div class="help-wanted">
-        <p>
-            Found a mistake or want to contribute to the documentation?
-            <a href="https://github.com/mezzio/mezzio-session/edit/master/docs/book/persistence.md" target="_blank" class="help-wanted__link">
-                Edit this page on GitHub!
-            </a>
-        </p>
-    </div>
-
-                
             </div>
             <div class="col-md-3 col-sm-12 sidebar">
                 
@@ -381,7 +202,7 @@ seconds the session should persist.</p>
                     
     <div class="subnavigation hidden-print">
         <h4 class="subnavigation__title">
-            <a href="..">mezzio-session</a>
+            <a href="../.">mezzio-session</a>
         </h4>
 
         <h5 class="subnavigation__subtitle">Table of Contents</h5>
@@ -420,8 +241,8 @@ seconds the session should persist.</p>
 
                                     
                                         
-    <li class="subnavigation__list-item subnavigation__list-item--active">
-        <a href="./" class="subnavigation__link">Session Persistence</a>
+    <li class="subnavigation__list-item ">
+        <a href="../persistence/" class="subnavigation__link">Session Persistence</a>
     </li>
 
                                     
