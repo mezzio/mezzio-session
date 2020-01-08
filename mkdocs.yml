@@ -12,4 +12,3 @@ site_description: 'Sessions and session middleware for PSR-7 applications.'
 repo_url: 'https://github.com/mezzio/mezzio-session'
 extra:
     project: Mezzio
-    project_url: 'https://docs.mezzio.dev'
