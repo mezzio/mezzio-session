@@ -1,6 +1,6 @@
 # mezzio-session
 
-[![Build Status](https://travis-ci.org/mezzio/mezzio-session.svg?branch=master)](https://travis-ci.org/mezzio/mezzio-session)
+[![Build Status](https://travis-ci.com/mezzio/mezzio-session.svg?branch=master)](https://travis-ci.com/mezzio/mezzio-session)
 [![Coverage Status](https://coveralls.io/repos/github/mezzio/mezzio-session/badge.svg?branch=master)](https://coveralls.io/github/mezzio/mezzio-session?branch=master)
 
 This library provides session handling middleware for PSR-7 applications, using
