@@ -62,7 +62,7 @@ file:
 
 ```php
 $app->pipe(\Mezzio\Session\SessionMiddleware::class);
-$app->pipeRoutingMiddleware();
+$app->pipe(\Mezzio\Router\Middleware\RouteMiddleware::class);
 ```
 
 This will generally be an inexpensive operation; since the middleware uses a
