@@ -340,7 +340,7 @@ it available anywhere, pipe it early in your application, prior to any routing.
 As an example, within Mezzio, you could pipe it in the <code>config/pipeline.php</code>
 file:</p>
 <pre class=codehilite><code class=language-php>$app-&gt;pipe(\Mezzio\Session\SessionMiddleware::class);
-$app-&gt;pipeRoutingMiddleware();</code></pre>
+$app-&gt;pipe(\Mezzio\Router\Middleware\RouteMiddleware::class);</code></pre>
 <p>This will generally be an inexpensive operation; since the middleware uses a
 <code>LazySession</code> instance, unless your persistence implementation does any work in
 its constructor, the cost is just that of instantiating a few objects.</p>
