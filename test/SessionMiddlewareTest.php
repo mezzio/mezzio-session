@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace MezzioTest\Session;
 
 use Mezzio\Session\LazySession;
+use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Session\SessionPersistenceInterface;
 use PHPUnit\Framework\TestCase;
@@ -33,6 +34,9 @@ class SessionMiddlewareTest extends TestCase
         $request = $this->prophesize(ServerRequestInterface::class);
         $request
             ->withAttribute(SessionMiddleware::SESSION_ATTRIBUTE, Argument::type(LazySession::class))
+            ->will([$request, 'reveal']);
+        $request
+            ->withAttribute(SessionInterface::class, Argument::type(LazySession::class))
             ->will([$request, 'reveal']);
 
         $response = $this->prophesize(ResponseInterface::class);
