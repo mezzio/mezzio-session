@@ -301,7 +301,7 @@ persistence instance to persist the session data and provide information back to
 the client.</p>
 <p>The above two paragraphs are longer than the body of the middleware
 implementation:</p>
-<pre class=codehilite><code class=language-php>namespace Mezzio\Session;
+<pre class="highlight"><code class="language-php">namespace Mezzio\Session;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -326,6 +326,7 @@ class SessionMiddleware implements MiddlewareInterface
         return $this-&gt;persistence-&gt;persistSession($session, $response);
     }
 }</code></pre>
+
 <h2 id="configuration">Configuration</h2>
 <p>This package provides a factory for <code>Mezzio\Session\SessionMiddleware</code>
 via <code>Mezzio\Session\SessionMiddlewareFactory</code>; this factory is
@@ -339,8 +340,9 @@ have the package providing it do so for you.</p>
 it available anywhere, pipe it early in your application, prior to any routing.
 As an example, within Mezzio, you could pipe it in the <code>config/pipeline.php</code>
 file:</p>
-<pre class=codehilite><code class=language-php>$app-&gt;pipe(\Mezzio\Session\SessionMiddleware::class);
+<pre class="highlight"><code class="language-php">$app-&gt;pipe(\Mezzio\Session\SessionMiddleware::class);
 $app-&gt;pipe(\Mezzio\Router\Middleware\RouteMiddleware::class);</code></pre>
+
 <p>This will generally be an inexpensive operation; since the middleware uses a
 <code>LazySession</code> instance, unless your persistence implementation does any work in
 its constructor, the cost is just that of instantiating a few objects.</p>
@@ -349,7 +351,7 @@ the routed middleware pipelines, to ensure other developers are aware of its
 presence in that route's workflow.</p>
 <p>Within Mezzio, you can do this when routing, in your <code>config/routes.php</code>
 file, or within a <a href="https://docs.mezzio.dev/mezzio/cookbook/autowiring-routes-and-pipelines/#delegator-factories">delegator factory</a>:</p>
-<pre class=codehilite><code class=language-php>$app-&gt;post('/login', [
+<pre class="highlight"><code class="language-php">$app-&gt;post('/login', [
     \Mezzio\Session\SessionMiddleware::class,
     \User\Middleware\LoginHandler::class
 ]);</code></pre>

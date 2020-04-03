@@ -298,7 +298,7 @@
 developers will work; they contain the data currently in the session, and allow
 you to push data to the session.</p>
 <p>All session containers implement <code>Mezzio\Session\SessionInterface</code>:</p>
-<pre class=codehilite><code class=language-php>namespace Mezzio\Session;
+<pre class="highlight"><code class="language-php">namespace Mezzio\Session;
 
 interface SessionInterface
 {
@@ -365,10 +365,11 @@ interface SessionInterface
      */
     public function isRegenerated() : bool;
 }</code></pre>
+
 <p>The default implementation, and the one you'll most likely interact with, is
 <code>Mezzio\Session\Session</code>.</p>
 <p>Since version 1.1.0, we provide <code>Mezzio\Session\SessionIdentifierAwareInterface</code>:</p>
-<pre class=codehilite><code class=language-php>namespace Mezzio\Session;
+<pre class="highlight"><code class="language-php">namespace Mezzio\Session;
 
 interface SessionIdentifierAwareInterface
 {
@@ -387,13 +388,14 @@ interface SessionIdentifierAwareInterface
      */
     public function getId() : string;
 }</code></pre>
+
 <p>Since version 1.2.0, we provide <code>Mezzio\Session\SessionCookiePersistenceInterface</code>:</p>
-<pre class=codehilite><code class=language-php>namespace Mezzio\Session;
+<pre class="highlight"><code class="language-php">namespace Mezzio\Session;
 
 /**
  * Allow marking session cookies as persistent.
  *
- * It can be useful to mark a session as persistent: e.g., for a &quot;Remember Me&quot;
+ * It can be useful to mark a session as persistent: e.g., for a "Remember Me"
  * feature when logging a user into your system. PHP provides this capability
  * via ext-session with the $lifetime argument to session_set_cookie_params()
  * as well as by the session.cookie_lifetime INI setting. The latter will set
@@ -450,6 +452,7 @@ interface SessionCookiePersistenceInterface
      */
     public function getSessionLifetime() : int;
 }</code></pre>
+
 <p><code>Mezzio\Session\Session</code> and <code>Mezzio\Session\LazySession</code> both
 implement each of the interfaces listed above. <code>Session</code> accepts an optional
 identifier to its constructor, and will use the value of the
@@ -461,27 +464,34 @@ to seed the session cookie lifetime, if present.</p>
 <code>Mezzio\Session\SessionMiddleware::SESSION_ATTRIBUTE</code> ("session")
 request attribute.</p>
 <p>Once you have the container, you can check for data:</p>
-<pre class=codehilite><code class=language-php>if ($session-&gt;has('user')) {
+<pre class="highlight"><code class="language-php">if ($session-&gt;has('user')) {
 }</code></pre>
+
 <p>and retrieve it:</p>
-<pre class=codehilite><code class=language-php>$user = $session-&gt;get('user');</code></pre>
+<pre class="highlight"><code class="language-php">$user = $session-&gt;get('user');</code></pre>
+
 <p>You can combine those operations, by passing a default value as a second
 argument to the <code>get()</code> method:</p>
-<pre class=codehilite><code class=language-php>$user = $session-&gt;get('user', new GuestUser());</code></pre>
+<pre class="highlight"><code class="language-php">$user = $session-&gt;get('user', new GuestUser());</code></pre>
+
 <p>If a datum is no longer relevant in the session, <code>unset()</code> it:</p>
-<pre class=codehilite><code class=language-php>$session-&gt;unset('user');</code></pre>
+<pre class="highlight"><code class="language-php">$session-&gt;unset('user');</code></pre>
+
 <p>If none of the data is relevant, <code>clear()</code> the session:</p>
-<pre class=codehilite><code class=language-php>$session-&gt;clear();</code></pre>
+<pre class="highlight"><code class="language-php">$session-&gt;clear();</code></pre>
+
 <h3>Persistent Sessions</h3>
 <ul>
 <li>Since 1.2.0</li>
 </ul>
 <p>You can hint to the session persistence engine how long the session should
 persist:</p>
-<pre class=codehilite><code class=language-php>$session-&gt;persistSessionFor(60 * 60 * 24 * 7); // persist for 7 days</code></pre>
+<pre class="highlight"><code class="language-php">$session-&gt;persistSessionFor(60 * 60 * 24 * 7); // persist for 7 days</code></pre>
+
 <p>To make the session expire when the browser session is terminated (default
 behavior), use zero or a negative integer:</p>
-<pre class=codehilite><code class=language-php>$session-&gt;persistSessionFor(0); // expire data after session is over</code></pre>
+<pre class="highlight"><code class="language-php">$session-&gt;persistSessionFor(0); // expire data after session is over</code></pre>
+
 <h2 id="lazy-sessions">Lazy Sessions</h2>
 <p>This package provides another implementation of <code>SessionInterface</code> via
 <code>Mezzio\Session\LazySession</code>. This implementation does the following:</p>
@@ -501,7 +511,8 @@ after a user has successfully logged in or out, you will generally want to
 regenerate the session in order to prevent session fixation and the attack
 vectors it invites.</p>
 <p>In those situations, call <code>regenerate()</code>:</p>
-<pre class=codehilite><code class=language-php>$newSession = $session-&gt;regenerate();</code></pre>
+<pre class="highlight"><code class="language-php">$newSession = $session-&gt;regenerate();</code></pre>
+
 <p>The interface indicates that a new instance <em>should</em> be returned. However, in
 the default usage, you will have a <code>LazySession</code> instance (as described above),
 which <em>decorates</em> the underlying session storage. This is done for two reasons:</p>
