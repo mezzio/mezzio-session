@@ -62,7 +62,7 @@ trait SessionCookieAwareTrait
      * In each case, if the value is not found, it falls back to generating a
      * new session identifier.
      */
-    private function getSessionCookieFromRequest(ServerRequestInterface $request) : string
+    private function getSessionCookieValueFromRequest(ServerRequestInterface $request) : string
     {
         if ('' === $request->getHeaderLine('Cookie')) {
             return $request->getCookieParams()[$this->cookieName] ?? '';
@@ -76,7 +76,7 @@ trait SessionCookieAwareTrait
      *
      * @param string $cookieValue The session-cookie value, tipically the session id
      */
-    private function addSessionCookieToResponse(
+    private function addSessionCookieHeaderToResponse(
         ResponseInterface $response,
         string $cookieValue,
         SessionInterface $session
