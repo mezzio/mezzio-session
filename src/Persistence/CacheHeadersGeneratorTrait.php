@@ -52,23 +52,6 @@ trait CacheHeadersGeneratorTrait
     private $lastModified;
 
     /**
-     * HTTP date format to be used in `gmdate` calls for creating valid header
-     * values.
-     *
-     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date
-     * @see https://tools.ietf.org/html/rfc7231#section-7.1.1.2
-     */
-    private static $httpDateFormat = 'D, d M Y H:i:s T';
-
-    /**
-     * This unusual past date value is taken from the php-engine source code and
-     * used "as is" for consistency. BTW, it's Sebastian Bergmann's birthdate.
-     *
-     * @see https://github.com/php/php-src/blob/php-7.4.4/ext/session/session.c#L1193
-     */
-    private static $cachePastDate = 'Thu, 19 Nov 1981 08:52:00 GMT';
-
-    /**
      * Add cache headers to the response when needed.
      */
     private function addCacheHeadersToResponse(ResponseInterface $response) : ResponseInterface
@@ -101,7 +84,7 @@ trait CacheHeadersGeneratorTrait
         // cache_limiter: 'nocache'
         if ('nocache' === $this->cacheLimiter) {
             return [
-                'Expires'       => self::$cachePastDate,
+                'Expires'       => Http::CACHE_PAST_DATE,
                 'Cache-Control' => 'no-store, no-cache, must-revalidate',
                 'Pragma'        => 'no-cache',
             ];
@@ -113,7 +96,7 @@ trait CacheHeadersGeneratorTrait
         // cache_limiter: 'public'
         if ('public' === $this->cacheLimiter) {
             return [
-                'Expires'       => gmdate(self::$httpDateFormat, time() + $maxAge),
+                'Expires'       => gmdate(Http::DATE_FORMAT, time() + $maxAge),
                 'Cache-Control' => sprintf('public, max-age=%d', $maxAge),
                 'Last-Modified' => $lastModified,
             ];
@@ -122,7 +105,7 @@ trait CacheHeadersGeneratorTrait
         // cache_limiter: 'private'
         if ('private' === $this->cacheLimiter) {
             return [
-                'Expires'       => self::$cachePastDate,
+                'Expires'       => Http::CACHE_PAST_DATE,
                 'Cache-Control' => sprintf('private, max-age=%d', $maxAge),
                 'Last-Modified' => $lastModified,
             ];
@@ -149,7 +132,7 @@ trait CacheHeadersGeneratorTrait
         }
 
         $lastmod = getlastmod() ?: filemtime(__FILE__);
-        $lastmod ? gmdate(self::$httpDateFormat, $lastmod) : false;
+        $lastmod ? gmdate(Http::DATE_FORMAT, $lastmod) : false;
         $this->lastModified = $lastmod;
 
         return $lastmod;
@@ -164,21 +147,5 @@ trait CacheHeadersGeneratorTrait
             || $response->hasHeader('Last-Modified')
             || $response->hasHeader('Cache-Control')
             || $response->hasHeader('Pragma');
-    }
-
-    /**
-     * @internal
-     */
-    public static function getHttpDateFormat() : string
-    {
-        return self::$httpDateFormat;
-    }
-
-    /**
-     * @internal
-     */
-    public static function getCachePastDate() : string
-    {
-        return self::$cachePastDate;
     }
 }
