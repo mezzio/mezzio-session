@@ -132,10 +132,9 @@ trait CacheHeadersGeneratorTrait
         }
 
         $lastmod = getlastmod() ?: filemtime(__FILE__);
-        $lastmod ? gmdate(Http::DATE_FORMAT, $lastmod) : false;
-        $this->lastModified = $lastmod;
+        $this->lastModified = $lastmod ? gmdate(Http::DATE_FORMAT, $lastmod) : false;
 
-        return $lastmod;
+        return $this->lastModified;
     }
 
     /**
