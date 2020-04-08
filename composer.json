@@ -32,12 +32,14 @@
     },
     "require": {
         "php": "^7.1",
+        "dflydev/fig-cookies": "^1.0.2 || ^2.0",
         "laminas/laminas-zendframework-bridge": "^1.0",
         "psr/container": "^1.0",
         "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {
         "laminas/laminas-coding-standard": "~1.0.0",
+        "laminas/laminas-diactoros": "^2.2",
         "phpunit/phpunit": "^6.5.5"
     },
     "conflict": {
