@@ -114,9 +114,13 @@ trait SessionCookieAwareTrait
             );
         }
 
-        return $cookieLifetime
-            ? $sessionCookie->withExpires(time() + $cookieLifetime)
-            : $sessionCookie;
+        if ($cookieLifetime) {
+            $sessionCookie = $sessionCookie
+                ->withExpires(time() + $cookieLifetime)
+                ->withMaxAge($cookieLifetime);
+        }
+
+        return $sessionCookie;
     }
 
     private function getSessionCookieLifetime(SessionInterface $session) : int
