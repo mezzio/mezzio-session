@@ -84,7 +84,6 @@ trait SessionCookieAwareTrait
         return FigResponseCookies::set(
             $response,
             $this->createSessionCookieForResponse(
-                $this->cookieName,
                 $cookieValue,
                 $this->getSessionCookieLifetime($session)
             )
