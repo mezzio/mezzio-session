@@ -6,7 +6,11 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Added
 
-- Nothing.
+- [#9](https://github.com/mezzio/mezzio-session/pull/9) adds the class `Mezzio\Session\Persistence\Http`, which defines constants related to HTTP date formats used when parsing and generating HTTP cookies.
+
+- [#9](https://github.com/mezzio/mezzio-session/pull/9) adds the trait `Mezzio\Session\Persistence\SessionCookieAwareTrait`. The trait defines the methods `getSessionCookieValueFromRequest()` and `addSessionCookieHeaderToResponse()`, which implementations can use in order to retrieve the session cookie from the request and generate it for the response.
+
+- [#9](https://github.com/mezzio/mezzio-session/pull/9) adds the trait `Mezzio\Session\Persistence\CacheHeadersGeneratorTrait`. The trait defines the method `addCacheHeadersToResponse()`, which implementations can use in order to inject cache control headers into the response returned.
 
 ### Changed
 
