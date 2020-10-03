@@ -30,7 +30,7 @@ class SessionCookieAwareTraitTest extends TestCase
 {
     const EXPIRE_REGEXP = '/'
         . 'Expires\='
-        . '(Sun|Mon|Tue|Wed|Thu|Fri|Sun), '
+        . '(Sun|Mon|Tue|Wed|Thu|Fri|Sat), '
         . '[0-3][0-9] '
         . '(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) '
         . '[0-9]{4} '
