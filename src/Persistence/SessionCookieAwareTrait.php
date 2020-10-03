@@ -51,6 +51,13 @@ trait SessionCookieAwareTrait
     private $cookieSameSite = '';
 
     /**
+     * Delete cookie from browser when session becomes empty?
+     *
+     * @var bool
+     */
+    private $deleteCookieOnEmptySession = false;
+
+    /**
      * Retrieve the session cookie value.
      *
      * Cookie headers may or may not be present, based on SAPI.  For instance,
@@ -125,6 +132,10 @@ trait SessionCookieAwareTrait
 
     private function getSessionCookieLifetime(SessionInterface $session) : int
     {
+        if ($this->deleteCookieOnEmptySession && ! $session->toArray()) {
+            return -(time() - 1);
+        }
+
         $lifetime = (int) $this->cookieLifetime;
         if ($session instanceof SessionCookiePersistenceInterface
             && $session->has(SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY)
@@ -133,5 +144,14 @@ trait SessionCookieAwareTrait
         }
 
         return $lifetime > 0 ? $lifetime : 0;
+    }
+
+    /**
+     * @internal
+     * @return bool whether we delete cookie from browser when session becomes empty
+     */
+    public function isDeleteCookieOnEmptySession(): bool
+    {
+        return $this->deleteCookieOnEmptySession;
     }
 }

@@ -12,10 +12,8 @@ namespace MezzioTest\Session\Persistence;
 
 use Dflydev\FigCookies\Cookie;
 use Dflydev\FigCookies\FigRequestCookies;
-use Dflydev\FigCookies\FigResponseCookies;
 use Dflydev\FigCookies\Modifier\SameSite;
 use Dflydev\FigCookies\SetCookie;
-use Dflydev\FigCookies\SetCookies;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequestFactory;
@@ -25,6 +23,8 @@ use Mezzio\Session\SessionInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+
+use function strpos;
 
 class SessionCookieAwareTraitTest extends TestCase
 {
@@ -45,6 +45,7 @@ class SessionCookieAwareTraitTest extends TestCase
     private const COOKIE_SECURE = false;
     private const COOKIE_HTTPONLY = false;
     private const COOKIE_SAMESITE = '';
+    private const DELETE_COOKIE_ON_EMPTY_SESSION = false;
 
     protected function setUp() : void
     {
@@ -57,7 +58,8 @@ class SessionCookieAwareTraitTest extends TestCase
         string $cookieDomain = null,
         bool $cookieSecure = null,
         bool $cookieHttpOnly = null,
-        string $cookieSameSite = null
+        string $cookieSameSite = null,
+        bool $deleteCookieOnEmptySession = null
     ) {
         return new class(
             $cookieName ?? self::COOKIE_NAME,
@@ -66,13 +68,15 @@ class SessionCookieAwareTraitTest extends TestCase
             $cookieDomain ?? self::COOKIE_DOMAIN,
             $cookieSecure ?? self::COOKIE_SECURE,
             $cookieHttpOnly ?? self::COOKIE_HTTPONLY,
-            $cookieSameSite ?? self::COOKIE_SAMESITE
+            $cookieSameSite ?? self::COOKIE_SAMESITE,
+            $deleteCookieOnEmptySession ?? self::DELETE_COOKIE_ON_EMPTY_SESSION
         ) {
             use SessionCookieAwareTrait {
                 getSessionCookieValueFromRequest as trait_getSessionCookieValueFromRequest;
                 addSessionCookieHeaderToResponse as trait_addSessionCookieHeaderToResponse;
                 createSessionCookieForResponse as trait_createSessionCookieForResponse;
                 getSessionCookieLifetime as trait_getSessionCookieLifetime;
+                isDeleteCookieOnEmptySession as trait_isDeleteCookieOnEmptySession;
             }
 
             public function __construct(
@@ -82,7 +86,8 @@ class SessionCookieAwareTraitTest extends TestCase
                 string $cookieDomain = null,
                 bool $cookieSecure = false,
                 bool $cookieHttpOnly = false,
-                string $cookieSameSite = ''
+                string $cookieSameSite = '',
+                bool $deleteCookieOnEmptySession = false
             ) {
                 $this->cookieName     = $cookieName;
                 $this->cookieLifetime = $cookieLifetime;
@@ -91,6 +96,7 @@ class SessionCookieAwareTraitTest extends TestCase
                 $this->cookieSecure   = $cookieSecure;
                 $this->cookieHttpOnly = $cookieHttpOnly;
                 $this->cookieSameSite = $cookieSameSite;
+                $this->deleteCookieOnEmptySession = $deleteCookieOnEmptySession;
             }
 
             public function getSessionCookieValueFromRequest(ServerRequestInterface $request) : string
@@ -114,6 +120,11 @@ class SessionCookieAwareTraitTest extends TestCase
             public function getSessionCookieLifetime(SessionInterface $session) : int
             {
                 return $this->trait_getSessionCookieLifetime($session);
+            }
+
+            public function isDeleteCookieOnEmptySession() : bool
+            {
+                return $this->trait_isDeleteCookieOnEmptySession();
             }
         };
     }
@@ -276,8 +287,8 @@ class SessionCookieAwareTraitTest extends TestCase
 
     public function testCreateSessionCookieForResponseWithSameSiteIfSupported()
     {
-        $cookieName  = 'PHPSESSID';
-        $cookieValue = 'a-cookie-value';
+        $cookieName     = 'PHPSESSID';
+        $cookieValue    = 'a-cookie-value';
         $cookieSameSite = 'Lax';
 
         $consumer = $this->createConsumerInstance($cookieName, null, null, null, null, null, $cookieSameSite);
@@ -315,10 +326,10 @@ class SessionCookieAwareTraitTest extends TestCase
     public function provideSessionCookieLifetimeValues()
     {
         return [
-            'default' => [null, null, 0],
+            'default'                 => [null, null, 0],
             'cookie=0|session=null'   => [0, null, 0],
             'cookie=0|session=0'      => [0, 0, 0],
-            'cookie=-1|session=null'   => [-1, null, 0],
+            'cookie=-1|session=null'  => [-1, null, 0],
             'cookie=-1|session=0'     => [-1, 0, 0],
             'cookie=-1|session=-1'    => [-1, -1, 0],
             'cookie=+60|session=null' => [60, null, 60],
@@ -326,8 +337,23 @@ class SessionCookieAwareTraitTest extends TestCase
             'cookie=+60|session=-1'   => [60, -1, 0],
             'cookie=+60|session=30'   => [60, 30, 30],
             'cookie=null|session=0'   => [null, 0, 0],
-            'cookie=null|session=-1'   => [null, -1, 0],
-            'cookie=null|session=30'   => [null, 30, 30],
+            'cookie=null|session=-1'  => [null, -1, 0],
+            'cookie=null|session=30'  => [null, 30, 30],
         ];
+    }
+
+    public function testSessionCookieIsDeletedFromBrowserWhenFlagIsSetAndSessionBecomesEmpty()
+    {
+        $cookieName  = 'SESSIONCOOKIENAME';
+        $cookieValue = 'session-cookie-value';
+
+        $consumer = $this->createConsumerInstance('SESSIONCOOKIENAME', null, null, null, null, null, null, true);
+        $session = new Session(['foo' => 'bar']);
+        $session->clear();
+        $response = $consumer->addSessionCookieHeaderToResponse(new Response(), $cookieValue, $session);
+
+        $cookieString = $response->getHeaderLine('Set-Cookie');
+        $expiresString = 'Expires=Thu, 01 Jan 1970 00:00:01 GMT';
+        $this->assertNotFalse(strpos($cookieString, $expiresString), 'cookie should bet set to expire in the past');
     }
 }
