@@ -15,21 +15,29 @@ use Mezzio\Session\SessionMiddlewareFactory;
 use Mezzio\Session\SessionPersistenceInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
+use ReflectionProperty;
 
 class SessionMiddlewareFactoryTest extends TestCase
 {
-    public function testFactoryProducesMiddlewareWithSessionPersistenceInterfaceService()
+    public function testFactoryProducesMiddlewareWithSessionPersistenceInterfaceService(): void
     {
-        $persistence = $this->prophesize(SessionPersistenceInterface::class)->reveal();
+        $persistence = $this->createMock(SessionPersistenceInterface::class);
 
-        $container = $this->prophesize(ContainerInterface::class);
-        $container->get(SessionPersistenceInterface::class)->willReturn($persistence);
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with(SessionPersistenceInterface::class)
+            ->willReturn($persistence);
 
         $factory = new SessionMiddlewareFactory();
 
-        $middleware = $factory($container->reveal());
+        $middleware = $factory($container);
 
         $this->assertInstanceOf(SessionMiddleware::class, $middleware);
-        $this->assertAttributeSame($persistence, 'persistence', $middleware);
+
+        $r = new ReflectionProperty($middleware, 'persistence');
+        $r->setAccessible(true);
+        $this->assertSame($persistence, $r->getValue($middleware));
     }
 }

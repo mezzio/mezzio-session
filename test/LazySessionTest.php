@@ -18,244 +18,250 @@ use Mezzio\Session\SessionCookiePersistenceInterface;
 use Mezzio\Session\SessionIdentifierAwareInterface;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionPersistenceInterface;
+use MezzioTest\Session\TestAsset\SessionInitializationPersistenceInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Psr\Http\Message\ServerRequestInterface;
+use ReflectionProperty;
 
 class LazySessionTest extends TestCase
 {
+    /** @var SessionInterface&\PHPUnit\Framework\MockObject\MockObject */
     private $proxy;
+    /** @var SessionPersistenceInterface&\PHPUnit\Framework\MockObject\MockObject */
     private $persistence;
+    /** @var ServerRequestInterface&\PHPUnit\Framework\MockObject\MockObject */
     private $request;
+    /** @var LazySession */
     private $session;
 
-    public function setUp()
+    public function setUp(): void
     {
-        $this->proxy = $this->prophesize(SessionInterface::class);
-        $this->persistence = $this->prophesize(SessionPersistenceInterface::class);
-        $this->request = $this->prophesize(ServerRequestInterface::class);
-        $this->session = new LazySession($this->persistence->reveal(), $this->request->reveal());
+        $this->proxy       = $this->createMock(SessionInterface::class);
+        $this->persistence = $this->createMock(SessionPersistenceInterface::class);
+        $this->request     = $this->createMock(ServerRequestInterface::class);
+        $this->session     = new LazySession($this->persistence, $this->request);
     }
 
     /**
-     * @param \Prophecy\ObjectProphecy|SessionPersistenceInterface $persistence
-     * @param \Prophecy\ObjectProphecy|ServerRequestInterface $request
+     * @param SessionPersistenceInterface&\PHPUnit\Framework\MockObject\MockObject $persistence
+     * @param ServerRequestInterface&\PHPUnit\Framework\MockObject\MockObject $request
      */
-    public function assertProxyCreated($persistence, $request)
+    public function assertProxyCreated($persistence, $request): void
     {
         $persistence
-            ->initializeSessionFromRequest(Argument::that([$request, 'reveal']))
-            ->will([$this->proxy, 'reveal']);
+            ->method('initializeSessionFromRequest')
+            ->with($request)
+            ->willReturn($this->proxy);
     }
 
-    public function initializeProxy()
+    public function initializeProxy(): void
     {
-        $this->proxy->has('foo')->willReturn(true);
+        $this->proxy->expects($this->once())->method('has')->with('foo')->willReturn(true);
         $this->session->has('foo');
     }
 
-    public function testRegenerateWillReturnSameInstance()
+    public function testRegenerateWillReturnSameInstance(): void
     {
-        $newSession = $this->prophesize(SessionInterface::class);
-        $newSession->isRegenerated()->willReturn(true);
+        $newSession = $this->createMock(SessionInterface::class);
 
         $this->assertProxyCreated($this->persistence, $this->request);
-        $this->proxy->regenerate()->will([$newSession, 'reveal']);
+        $this->proxy->method('regenerate')->willReturn($newSession);
 
         $regeneratedSession = $this->session->regenerate();
         $this->assertSame($this->session, $regeneratedSession);
-        $this->assertAttributeSame($newSession->reveal(), 'proxiedSession', $regeneratedSession);
 
-        return $this->session;
+        $r = new ReflectionProperty($regeneratedSession, 'proxiedSession');
+        $r->setAccessible(true);
+        $this->assertSame($newSession, $r->getValue($regeneratedSession));
     }
 
-    /**
-     * @depends testRegenerateWillReturnSameInstance
-     */
-    public function testIsRegeneratedReturnsTrueAfterSessionRegeneration(LazySession $session)
+    public function testIsRegeneratedReturnsTrueAfterSessionRegeneration(): void
     {
-        $this->assertTrue($session->isRegenerated());
+        $newSession = $this->createMock(SessionInterface::class);
+        $newSession->expects($this->once())->method('isRegenerated')->willReturn(true);
+
+        $this->assertProxyCreated($this->persistence, $this->request);
+        $this->proxy->method('regenerate')->willReturn($newSession);
+
+        $this->session->regenerate();
+
+        $this->assertTrue($this->session->isRegenerated());
     }
 
-    public function testIsRegneratedReturnsFalseIfProxiedSessionIsNotRegenerated()
+    public function testIsRegneratedReturnsFalseIfProxiedSessionIsNotRegenerated(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
-        $this->proxy->isRegenerated()->willReturn(false);
+        $this->proxy->method('isRegenerated')->willReturn(false);
         $this->assertFalse($this->session->isRegenerated());
     }
 
-    public function testToArrayProxiesToUnderlyingSession()
+    public function testToArrayProxiesToUnderlyingSession(): void
     {
         $expected = ['foo' => 'bar'];
         $this->assertProxyCreated($this->persistence, $this->request);
-        $this->proxy->toArray()->willReturn($expected);
+        $this->proxy->method('toArray')->willReturn($expected);
         $this->assertSame($expected, $this->session->toArray());
     }
 
-    public function testGetProxiesToUnderlyingSession()
+    public function testGetProxiesToUnderlyingSession(): void
     {
         $expected = 'foo';
         $this->assertProxyCreated($this->persistence, $this->request);
-        $this->proxy->get('test', 'bar')->willReturn($expected);
+        $this->proxy->method('get')->with('test', 'bar')->willReturn($expected);
         $this->assertSame($expected, $this->session->get('test', 'bar'));
     }
 
-    public function testHasProxiesToUnderlyingSession()
+    public function testHasProxiesToUnderlyingSession(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
-        $this->proxy->has('test')->willReturn(true);
+        $this->proxy->method('has')->with('test')->willReturn(true);
         $this->assertTrue($this->session->has('test'));
     }
 
-    public function testSetProxiesToUnderlyingSession()
+    public function testSetProxiesToUnderlyingSession(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
-        $this->proxy->set('test', 'bar')->shouldBeCalled();
+        $this->proxy->expects($this->once())->method('set')->with('test', 'bar');
         $this->assertNull($this->session->set('test', 'bar'));
     }
 
-    public function testUnsetProxiesToUnderlyingSession()
+    public function testUnsetProxiesToUnderlyingSession(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
-        $this->proxy->unset('test')->shouldBeCalled();
+        $this->proxy->expects($this->once())->method('unset')->with('test');
         $this->assertNull($this->session->unset('test'));
     }
 
-    public function testClearProxiesToUnderlyingSession()
+    public function testClearProxiesToUnderlyingSession(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
-        $this->proxy->clear()->shouldBeCalled();
+        $this->proxy->expects($this->once())->method('clear');
         $this->assertNull($this->session->clear());
     }
 
-    public function testHasChangedReturnsFalseIfProxyNotInitialized()
+    public function testHasChangedReturnsFalseIfProxyNotInitialized(): void
     {
-        $this->proxy->hasChanged()->shouldNotBeCalled();
+        $this->proxy->expects($this->never())->method('hasChanged');
         $this->assertFalse($this->session->hasChanged());
     }
 
-    public function testHasChangedReturnsFalseIfProxyInitializedAndDoesNotHaveChanges()
+    public function testHasChangedReturnsFalseIfProxyInitializedAndDoesNotHaveChanges(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
         $this->initializeProxy();
-        $this->proxy->isRegenerated()->willReturn(false);
-        $this->proxy->hasChanged()->willReturn(false);
+        $this->proxy->method('isRegenerated')->willReturn(false);
+        $this->proxy->method('hasChanged')->willReturn(false);
         $this->assertFalse($this->session->hasChanged());
     }
 
-    public function testHasChangedReturnsTrueIfProxyInitializedAndHasChanges()
+    public function testHasChangedReturnsTrueIfProxyInitializedAndHasChanges(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
         $this->initializeProxy();
-        $this->proxy->isRegenerated()->willReturn(false);
-        $this->proxy->hasChanged()->willReturn(true);
+        $this->proxy->method('isRegenerated')->willReturn(false);
+        $this->proxy->method('hasChanged')->willReturn(true);
         $this->assertTrue($this->session->hasChanged());
     }
 
-    public function testHasChangedReturnsTrueIfProxyHasBeenRegenerated()
+    public function testHasChangedReturnsTrueIfProxyHasBeenRegenerated(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
         $this->initializeProxy();
-        $this->proxy->isRegenerated()->willReturn(true);
-        $this->proxy->hasChanged()->shouldNotBeCalled();
+        $this->proxy->method('isRegenerated')->willReturn(true);
+        $this->proxy->expects($this->never())->method('hasChanged');
         $this->assertTrue($this->session->hasChanged());
     }
 
-    public function testGetIdReturnsEmptyStringIfProxyDoesNotImplementIdentifierAwareInterface()
+    public function testGetIdReturnsEmptyStringIfProxyDoesNotImplementIdentifierAwareInterface(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
         $this->initializeProxy();
         $this->assertSame('', $this->session->getId());
     }
 
-    public function testGetIdReturnsValueFromProxyIfItImplementsIdentiferAwareInterface()
+    public function testGetIdReturnsValueFromProxyIfItImplementsIdentiferAwareInterface(): void
     {
-        $proxy = $this->prophesize(SessionInterface::class);
-        $proxy->willImplement(SessionIdentifierAwareInterface::class);
+        $proxy = $this->createMock(Session::class);
+        $proxy->method('getId')->willReturn('abcd1234');
         $this->persistence
-            ->initializeSessionFromRequest(Argument::that([$this->request, 'reveal']))
-            ->will([$proxy, 'reveal']);
-        $proxy->getId()->willReturn('abcd1234');
+            ->method('initializeSessionFromRequest')
+            ->with($this->request)
+            ->willReturn($proxy);
 
-        $session = new LazySession($this->persistence->reveal(), $this->request->reveal());
+        $session = new LazySession($this->persistence, $this->request);
 
         $this->assertSame('abcd1234', $session->getId());
     }
 
-    public function testPersistSessionForDoesNothingIfProxyDoesNotImplementSessionCookiePersistence()
+    public function testPersistSessionForDoesNothingIfProxyDoesNotImplementSessionCookiePersistence(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
         $this->initializeProxy();
 
-        $session = new LazySession($this->persistence->reveal(), $this->request->reveal());
+        $session = new LazySession($this->persistence, $this->request);
 
         $this->assertNull($session->persistSessionFor(60));
     }
 
-    public function testPersistSessionForProxiesToUnderlyingSession()
+    public function testPersistSessionForProxiesToUnderlyingSession(): void
     {
-        $proxy = $this->prophesize(SessionInterface::class);
-        $proxy->willImplement(SessionCookiePersistenceInterface::class);
+        $proxy = $this->createMock(Session::class);
+        $proxy->expects($this->once())->method('persistSessionFor')->with(60);
         $this->persistence
-            ->initializeSessionFromRequest(Argument::that([$this->request, 'reveal']))
-            ->will([$proxy, 'reveal']);
-        $proxy->persistSessionFor(60)->shouldBeCalled();
+            ->method('initializeSessionFromRequest')
+            ->with($this->request)
+            ->willReturn($proxy);
 
-        $session = new LazySession($this->persistence->reveal(), $this->request->reveal());
+        $session = new LazySession($this->persistence, $this->request);
 
         $this->assertNull($session->persistSessionFor(60));
     }
 
-    public function testGetSessionLifetimeReturnsZeroIfProxyDoesNotImplementSessionCookiePersistence()
+    public function testGetSessionLifetimeReturnsZeroIfProxyDoesNotImplementSessionCookiePersistence(): void
     {
         $this->assertProxyCreated($this->persistence, $this->request);
         $this->initializeProxy();
 
-        $session = new LazySession($this->persistence->reveal(), $this->request->reveal());
+        $session = new LazySession($this->persistence, $this->request);
 
         $this->assertSame(0, $session->getSessionLifetime());
     }
 
-    public function testGetSessionLifetimeReturnsValueFromProxy()
+    public function testGetSessionLifetimeReturnsValueFromProxy(): void
     {
-        $proxy = $this->prophesize(SessionInterface::class);
-        $proxy->willImplement(SessionCookiePersistenceInterface::class);
-        $this->persistence
-            ->initializeSessionFromRequest(Argument::that([$this->request, 'reveal']))
-            ->will([$proxy, 'reveal']);
-        $proxy->getSessionLifetime()->willReturn(60);
+        $proxy = $this->createMock(Session::class);
+        $proxy->method('getSessionLifetime')->willReturn(60);
+        $this->persistence->method('initializeSessionFromRequest')->with($this->request)->willReturn($proxy);
 
-        $session = new LazySession($this->persistence->reveal(), $this->request->reveal());
+        $session = new LazySession($this->persistence, $this->request);
 
         $this->assertSame(60, $session->getSessionLifetime());
     }
 
-    public function testInitializeIdThrowsNotInitializeableException()
+    public function testInitializeIdThrowsNotInitializeableException(): void
     {
         $this->expectException(NotInitializableException::class);
         $this->session->initializeId();
     }
 
-    public function testGenerateIdReturnsId()
+    public function testGenerateIdReturnsId(): void
     {
-        $newProxy = $this->prophesize(SessionInterface::class);
-        $newProxy->willImplement(SessionIdentifierAwareInterface::class);
-        $newProxy->getId()
-            ->willReturn('generated-id');
-        $proxy = $newProxy->reveal();
+        $newProxy = $this->createMock(Session::class);
+        $newProxy->method('getId')->willReturn('generated-id');
+        $proxy = $newProxy;
 
-        $persistence = $this->prophesize(SessionPersistenceInterface::class);
-        $persistence->willImplement(InitializePersistenceIdInterface::class);
-        $persistence
-            ->initializeId(Argument::that([$this->proxy, 'reveal']))
-            ->willReturn($proxy);
+        $persistence = $this->createMock(SessionInitializationPersistenceInterface::class);
+        $persistence->method('initializeId')->with($this->proxy)->willReturn($proxy);
 
         $this->assertProxyCreated($persistence, $this->request);
 
-        $session = new LazySession($persistence->reveal(), $this->request->reveal());
+        $session = new LazySession($persistence, $this->request);
         $actual = $session->initializeId();
 
-        $this->assertAttributeSame($proxy, 'proxiedSession', $session);
+        $r = new ReflectionProperty($session, 'proxiedSession');
+        $r->setAccessible(true);
+        $this->assertSame($proxy, $r->getValue($session));
         $this->assertSame('generated-id', $actual);
     }
 }

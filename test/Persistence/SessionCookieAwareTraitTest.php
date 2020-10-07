@@ -60,7 +60,7 @@ class SessionCookieAwareTraitTest extends TestCase
         bool $cookieHttpOnly = null,
         string $cookieSameSite = null,
         bool $deleteCookieOnEmptySession = null
-    ) {
+    ): object {
         return new class(
             $cookieName ?? self::COOKIE_NAME,
             $cookieLifetime ?? self::COOKIE_LIFETIME,
@@ -136,7 +136,7 @@ class SessionCookieAwareTraitTest extends TestCase
         string $cookieName,
         string $cookieValue = null,
         string $expected = null
-    ) {
+    ): void {
         $consumer = $this->createConsumerInstance($cookieName);
 
         $cookies = [$cookieName => $cookieValue];
@@ -152,7 +152,7 @@ class SessionCookieAwareTraitTest extends TestCase
         string $cookieName,
         string $cookieValue = null,
         string $expected = null
-    ) {
+    ): void {
         $consumer = $this->createConsumerInstance($cookieName);
 
         $cookie = Cookie::create($cookieName, $cookieValue);
@@ -161,20 +161,20 @@ class SessionCookieAwareTraitTest extends TestCase
         self::assertSame($expected, $consumer->getSessionCookieValueFromRequest($request));
     }
 
-    public function provideRequestSessionCookieValues()
+    public function provideRequestSessionCookieValues(): array
     {
-        $cookieName  = 'SESSIONID';
-        $cookieNiceValue = 'some-nice-value';
+        $cookieName       = 'SESSIONID';
+        $cookieNiceValue  = 'some-nice-value';
         $cookieWeirdValue = '!"£$%&/';
 
         return [
-            [$cookieName, null, ''],
-            [$cookieName, $cookieNiceValue, $cookieNiceValue],
+            [$cookieName, null,              ''],
+            [$cookieName, $cookieNiceValue,  $cookieNiceValue],
             [$cookieName, $cookieWeirdValue, $cookieWeirdValue],
         ];
     }
 
-    public function testAddSessionCookieHeaderToResponse()
+    public function testAddSessionCookieHeaderToResponse(): void
     {
         $cookieName  = 'ADDSESSIONCOOKIEID';
         $cookieValue = 'set-some-cookie-value';
@@ -189,7 +189,7 @@ class SessionCookieAwareTraitTest extends TestCase
         $actualHeaderLine = $response->getHeaderLine('Set-Cookie');
 
         self::assertStringStartsWith(sprintf('%s=%s; Path=/; Expires=', $cookieName, $cookieValue), $actualHeaderLine);
-        self::assertRegExp(self::EXPIRE_REGEXP, $actualHeaderLine);
+        self::assertMatchesRegularExpression(self::EXPIRE_REGEXP, $actualHeaderLine);
         self::assertStringEndsWith(sprintf('GMT; Max-Age=%d', $sessionLifetime), $actualHeaderLine);
     }
 
@@ -201,7 +201,7 @@ class SessionCookieAwareTraitTest extends TestCase
         ?string $cookieValue,
         int $cookieLifetime,
         string $expectedHeaderLine
-    ) {
+    ): void {
         $consumer = $this->createConsumerInstance($cookieName);
         $setCookie = $consumer->createSessionCookieForResponse(
             $cookieValue ?? '',
@@ -213,95 +213,90 @@ class SessionCookieAwareTraitTest extends TestCase
         self::assertSame($expectedHeaderLine, $actualHeaderLine);
     }
 
-    public function provideResponseCookieHeaderLines()
+    public function provideResponseCookieHeaderLines(): array
     {
-        $cookieName = 'PHPSESSID';
-
-        $cookieNiceValue = 'some-nice-value';
+        $cookieName       = 'PHPSESSID';
+        $cookieNiceValue  = 'some-nice-value';
         $cookieWeirdValue = '!"£$%&/';
 
         return [
-            [$cookieName, null, 0, sprintf('%s=; Path=/', $cookieName)],
-            [$cookieName, $cookieNiceValue, 0, sprintf('%s=%s; Path=/', $cookieName, $cookieNiceValue)],
+            [$cookieName, null,              0, sprintf('%s=; Path=/',   $cookieName)],
+            [$cookieName, $cookieNiceValue,  0, sprintf('%s=%s; Path=/', $cookieName, $cookieNiceValue)],
             [$cookieName, $cookieWeirdValue, 0, sprintf('%s=%s; Path=/', $cookieName, urlencode($cookieWeirdValue))],
         ];
     }
 
-    public function testCreateSessionCookieForResponseWithExpires()
+    public function testCreateSessionCookieForResponseWithExpires(): void
     {
-        $cookieName  = 'PHPSESSID';
-        $cookieValue = 'a-cookie-value';
+        $cookieName     = 'PHPSESSID';
+        $cookieValue    = 'a-cookie-value';
         $cookieLifetime = 3600;
 
-        $consumer = $this->createConsumerInstance($cookieName);
+        $consumer  = $this->createConsumerInstance($cookieName);
         $setCookie = $consumer->createSessionCookieForResponse($cookieValue, $cookieLifetime);
 
         $actual = (string) $setCookie;
 
         self::assertStringStartsWith(sprintf('%s=%s; Path=/; ', $cookieName, $cookieValue), $actual);
-        self::assertRegExp(self::EXPIRE_REGEXP, $actual);
+        self::assertMatchesRegularExpression(self::EXPIRE_REGEXP, $actual);
     }
 
-    public function testCreateSessionCookieForResponseWithDomain()
+    public function testCreateSessionCookieForResponseWithDomain(): void
     {
-        $cookieName  = 'PHPSESSID';
-        $cookieValue = 'a-cookie-value';
+        $cookieName   = 'PHPSESSID';
+        $cookieValue  = 'a-cookie-value';
         $cookieDomain = 'example.com';
 
-        $consumer = $this->createConsumerInstance($cookieName, null, null, $cookieDomain);
+        $consumer  = $this->createConsumerInstance($cookieName, null, null, $cookieDomain);
         $setCookie = $consumer->createSessionCookieForResponse($cookieValue);
 
         $expected = sprintf('%s=%s; Domain=%s; Path=/', $cookieName, $cookieValue, $cookieDomain);
-        $actual = (string) $setCookie;
+        $actual   = (string) $setCookie;
 
         self::assertSame($expected, $actual);
     }
 
-    public function testCreateSessionCookieForResponseWithSecure()
+    public function testCreateSessionCookieForResponseWithSecure(): void
     {
         $cookieName  = 'PHPSESSID';
         $cookieValue = 'a-cookie-value';
 
-        $consumer = $this->createConsumerInstance($cookieName, null, null, null, true);
+        $consumer  = $this->createConsumerInstance($cookieName, null, null, null, true);
         $setCookie = $consumer->createSessionCookieForResponse($cookieValue);
 
         $expected = sprintf('%s=%s; Path=/; Secure', $cookieName, $cookieValue);
-        $actual = (string) $setCookie;
+        $actual   = (string) $setCookie;
 
         self::assertSame($expected, $actual);
     }
 
-    public function testCreateSessionCookieForResponseWithHttpOnly()
+    public function testCreateSessionCookieForResponseWithHttpOnly(): void
     {
         $cookieName  = 'PHPSESSID';
         $cookieValue = 'a-cookie-value';
 
-        $consumer = $this->createConsumerInstance($cookieName, null, null, null, null, true);
+        $consumer  = $this->createConsumerInstance($cookieName, null, null, null, null, true);
         $setCookie = $consumer->createSessionCookieForResponse($cookieValue);
 
         $expected = sprintf('%s=%s; Path=/; HttpOnly', $cookieName, $cookieValue);
-        $actual = (string) $setCookie;
+        $actual   = (string) $setCookie;
 
         self::assertSame($expected, $actual);
     }
 
-    public function testCreateSessionCookieForResponseWithSameSiteIfSupported()
+    public function testCreateSessionCookieForResponseWithSameSiteIfSupported(): void
     {
         $cookieName     = 'PHPSESSID';
         $cookieValue    = 'a-cookie-value';
         $cookieSameSite = 'Lax';
 
-        $consumer = $this->createConsumerInstance($cookieName, null, null, null, null, null, $cookieSameSite);
+        $consumer  = $this->createConsumerInstance($cookieName, null, null, null, null, null, $cookieSameSite);
         $setCookie = $consumer->createSessionCookieForResponse($cookieValue);
 
-        if (class_exists(SameSite::class)
-            && method_exists($setCookie, 'withSameSite')
-        ) {
-            $expected = sprintf('%s=%s; Path=/; SameSite=%s', $cookieName, $cookieValue, $cookieSameSite);
-        } else {
-            $expected = sprintf('%s=%s; Path=/', $cookieName, $cookieValue);
-        }
-        $actual = (string) $setCookie;
+        $expected = class_exists(SameSite::class) && method_exists($setCookie, 'withSameSite')
+            ? sprintf('%s=%s; Path=/; SameSite=%s', $cookieName, $cookieValue, $cookieSameSite)
+            : sprintf('%s=%s; Path=/', $cookieName, $cookieValue);
+        $actual   = (string) $setCookie;
 
         self::assertSame($expected, $actual);
     }
@@ -313,9 +308,9 @@ class SessionCookieAwareTraitTest extends TestCase
         int $cookieLifetime = null,
         int $sessionLifetime = null,
         int $expected = null
-    ) {
+    ): void {
         $consumer = $this->createConsumerInstance('SESSIONCOOKIENAME', $cookieLifetime ?? 0);
-        $session = new Session([]);
+        $session  = new Session([]);
         if (isset($sessionLifetime)) {
             $session->persistSessionFor($sessionLifetime);
         }
@@ -323,36 +318,36 @@ class SessionCookieAwareTraitTest extends TestCase
         self::assertSame($expected, $consumer->getSessionCookieLifetime($session));
     }
 
-    public function provideSessionCookieLifetimeValues()
+    public function provideSessionCookieLifetimeValues(): array
     {
         return [
             'default'                 => [null, null, 0],
-            'cookie=0|session=null'   => [0, null, 0],
-            'cookie=0|session=0'      => [0, 0, 0],
-            'cookie=-1|session=null'  => [-1, null, 0],
-            'cookie=-1|session=0'     => [-1, 0, 0],
-            'cookie=-1|session=-1'    => [-1, -1, 0],
-            'cookie=+60|session=null' => [60, null, 60],
-            'cookie=+60|session=0'    => [60, 0, 0],
-            'cookie=+60|session=-1'   => [60, -1, 0],
-            'cookie=+60|session=30'   => [60, 30, 30],
-            'cookie=null|session=0'   => [null, 0, 0],
-            'cookie=null|session=-1'  => [null, -1, 0],
-            'cookie=null|session=30'  => [null, 30, 30],
+            'cookie=0|session=null'   => [0,    null, 0],
+            'cookie=0|session=0'      => [0,    0,    0],
+            'cookie=-1|session=null'  => [-1,   null, 0],
+            'cookie=-1|session=0'     => [-1,   0,    0],
+            'cookie=-1|session=-1'    => [-1,   -1,   0],
+            'cookie=+60|session=null' => [60,   null, 60],
+            'cookie=+60|session=0'    => [60,   0,    0],
+            'cookie=+60|session=-1'   => [60,   -1,   0],
+            'cookie=+60|session=30'   => [60,   30,   30],
+            'cookie=null|session=0'   => [null, 0,    0],
+            'cookie=null|session=-1'  => [null, -1,   0],
+            'cookie=null|session=30'  => [null, 30,   30],
         ];
     }
 
-    public function testSessionCookieIsDeletedFromBrowserWhenFlagIsSetAndSessionBecomesEmpty()
+    public function testSessionCookieIsDeletedFromBrowserWhenFlagIsSetAndSessionBecomesEmpty(): void
     {
         $cookieName  = 'SESSIONCOOKIENAME';
         $cookieValue = 'session-cookie-value';
 
         $consumer = $this->createConsumerInstance('SESSIONCOOKIENAME', null, null, null, null, null, null, true);
-        $session = new Session(['foo' => 'bar']);
+        $session  = new Session(['foo' => 'bar']);
         $session->clear();
         $response = $consumer->addSessionCookieHeaderToResponse(new Response(), $cookieValue, $session);
 
-        $cookieString = $response->getHeaderLine('Set-Cookie');
+        $cookieString  = $response->getHeaderLine('Set-Cookie');
         $expiresString = 'Expires=Thu, 01 Jan 1970 00:00:01 GMT';
         $this->assertNotFalse(strpos($cookieString, $expiresString), 'cookie should bet set to expire in the past');
     }

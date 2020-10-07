@@ -18,25 +18,25 @@ use PHPUnit\Framework\TestCase;
 
 class SessionTest extends TestCase
 {
-    public function testImplementsSessionInterface()
+    public function testImplementsSessionInterface(): void
     {
         $session = new Session([]);
         $this->assertInstanceOf(SessionInterface::class, $session);
     }
 
-    public function testIsNotChangedAtInstantiation()
+    public function testIsNotChangedAtInstantiation(): void
     {
         $session = new Session([]);
         $this->assertFalse($session->hasChanged());
     }
 
-    public function testIsNotRegeneratedByDefault()
+    public function testIsNotRegeneratedByDefault(): void
     {
         $session = new Session([]);
         $this->assertFalse($session->isRegenerated());
     }
 
-    public function testRegenerateProducesANewInstance()
+    public function testRegenerateProducesANewInstance(): Session
     {
         $session = new Session([]);
         $regenerated = $session->regenerate();
@@ -47,7 +47,7 @@ class SessionTest extends TestCase
     /**
      * @depends testRegenerateProducesANewInstance
      */
-    public function testRegeneratedSessionReturnsTrueForIsRegenerated(SessionInterface $session)
+    public function testRegeneratedSessionReturnsTrueForIsRegenerated(SessionInterface $session): void
     {
         $this->assertTrue($session->isRegenerated());
     }
@@ -55,12 +55,12 @@ class SessionTest extends TestCase
     /**
      * @depends testRegenerateProducesANewInstance
      */
-    public function testRegeneratedSessionIsChanged(SessionInterface $session)
+    public function testRegeneratedSessionIsChanged(SessionInterface $session): void
     {
         $this->assertTrue($session->hasChanged());
     }
 
-    public function testSettingDataInSessionMakesItAccessible()
+    public function testSettingDataInSessionMakesItAccessible(): Session
     {
         $session = new Session([]);
         $this->assertFalse($session->has('foo'));
@@ -73,7 +73,7 @@ class SessionTest extends TestCase
     /**
      * @depends testSettingDataInSessionMakesItAccessible
      */
-    public function testSettingDataInSessionChangesSession(SessionInterface $session)
+    public function testSettingDataInSessionChangesSession(SessionInterface $session): void
     {
         $this->assertTrue($session->hasChanged());
     }
@@ -81,7 +81,7 @@ class SessionTest extends TestCase
     /**
      * @depends testSettingDataInSessionMakesItAccessible
      */
-    public function testToArrayReturnsAllDataPreviouslySet(SessionInterface $session)
+    public function testToArrayReturnsAllDataPreviouslySet(SessionInterface $session): void
     {
         $this->assertSame(['foo' => 'bar'], $session->toArray());
     }
@@ -89,13 +89,13 @@ class SessionTest extends TestCase
     /**
      * @depends testSettingDataInSessionMakesItAccessible
      */
-    public function testCanUnsetDataInSession(SessionInterface $session)
+    public function testCanUnsetDataInSession(SessionInterface $session): void
     {
         $session->unset('foo');
         $this->assertFalse($session->has('foo'));
     }
 
-    public function testClearingSessionRemovesAllData()
+    public function testClearingSessionRemovesAllData(): void
     {
         $original = [
             'foo' => 'bar',
@@ -109,7 +109,7 @@ class SessionTest extends TestCase
         $this->assertSame([], $session->toArray());
     }
 
-    public function serializedDataProvider() : iterable
+    public function serializedDataProvider(): iterable
     {
         $data = (object) ['test_case' => $this];
         $expected = json_decode(json_encode($data, \JSON_PRESERVE_ZERO_FRACTION), true);
@@ -119,7 +119,7 @@ class SessionTest extends TestCase
     /**
      * @dataProvider serializedDataProvider
      */
-    public function testSetEnsuresDataIsJsonSerializable($data, $expected)
+    public function testSetEnsuresDataIsJsonSerializable($data, $expected): void
     {
         $session = new Session([]);
         $session->set('foo', $data);
@@ -127,44 +127,44 @@ class SessionTest extends TestCase
         $this->assertSame($expected, $session->get('foo'));
     }
 
-    public function testImplementsSessionIdentifierAwareInterface()
+    public function testImplementsSessionIdentifierAwareInterface(): void
     {
         $session = new Session([]);
         $this->assertInstanceOf(SessionIdentifierAwareInterface::class, $session);
     }
 
-    public function testGetIdReturnsEmptyStringIfNoIdentifierProvidedToConstructor()
+    public function testGetIdReturnsEmptyStringIfNoIdentifierProvidedToConstructor(): void
     {
         $session = new Session([]);
         $this->assertSame('', $session->getId());
     }
 
-    public function testGetIdReturnsValueProvidedToConstructor()
+    public function testGetIdReturnsValueProvidedToConstructor(): void
     {
         $session = new Session([], '1234abcd');
         $this->assertSame('1234abcd', $session->getId());
     }
 
-    public function testImplementsSessionCookiePersistenceInterface()
+    public function testImplementsSessionCookiePersistenceInterface(): void
     {
         $session = new Session([]);
         $this->assertInstanceOf(SessionCookiePersistenceInterface::class, $session);
     }
 
-    public function testDefaultSessionCookieLifetimeIsZero()
+    public function testDefaultSessionCookieLifetimeIsZero(): void
     {
         $session = new Session([]);
         $this->assertSame(0, $session->getSessionLifetime());
     }
 
-    public function testAllowsSettingCookieLifetime()
+    public function testAllowsSettingCookieLifetime(): void
     {
         $session = new Session([]);
         $session->persistSessionFor(60);
         $this->assertSame(60, $session->getSessionLifetime());
     }
 
-    public function testGetSessionLifetimeReturnsValueOfSessionLifetimeKeyWhenPresentInSession()
+    public function testGetSessionLifetimeReturnsValueOfSessionLifetimeKeyWhenPresentInSession(): void
     {
         $session = new Session([
             SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY => 60,
@@ -172,7 +172,7 @@ class SessionTest extends TestCase
         $this->assertSame(60, $session->getSessionLifetime());
     }
 
-    public function testPersistingSessionCookieLifetimeSetsLifetimeKeyInSessionData()
+    public function testPersistingSessionCookieLifetimeSetsLifetimeKeyInSessionData(): void
     {
         $session = new Session([]);
         $session->persistSessionFor(60);

@@ -15,49 +15,79 @@ use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Session\SessionPersistenceInterface;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ReflectionProperty;
 
 class SessionMiddlewareTest extends TestCase
 {
-    public function testConstructorAcceptsConcretePersistenceInstances()
+    /**
+     * @return mixed
+     */
+    private function getAttribute(object $instance, string $property)
     {
-        $persistence = $this->prophesize(SessionPersistenceInterface::class)->reveal();
-        $middleware = new SessionMiddleware($persistence);
+        $r = new ReflectionProperty($instance, $property);
+        $r->setAccessible(true);
+        return $r->getValue($instance);
+    }
+
+    /**
+     * @param mixed $expected
+     */
+    private function assertAttributeSame($expected, string $property, object $instance): void
+    {
+        $this->assertSame($expected, $this->getAttribute($instance, $property));
+    }
+
+    public function testConstructorAcceptsConcretePersistenceInstances(): void
+    {
+        $persistence = $this->createMock(SessionPersistenceInterface::class);
+        $middleware  = new SessionMiddleware($persistence);
+
         $this->assertAttributeSame($persistence, 'persistence', $middleware);
     }
 
-    public function testMiddlewareCreatesLazySessionAndPassesItToDelegateAndPersistsSessionInResponse()
+    public function testMiddlewareCreatesLazySessionAndPassesItToDelegateAndPersistsSessionInResponse(): void
     {
-        $request = $this->prophesize(ServerRequestInterface::class);
+        /** @var ServerRequestInterface&\PHPUnit\Framework\MockObject\MockObject $request */
+        $request = $this->createMock(ServerRequestInterface::class);
         $request
-            ->withAttribute(SessionMiddleware::SESSION_ATTRIBUTE, Argument::type(LazySession::class))
-            ->will([$request, 'reveal']);
-        $request
-            ->withAttribute(SessionInterface::class, Argument::type(LazySession::class))
-            ->will([$request, 'reveal']);
-
-        $response = $this->prophesize(ResponseInterface::class);
-
-        $handler = $this->prophesize(RequestHandlerInterface::class);
-        $handler->handle(Argument::that([$request, 'reveal']))->will([$response, 'reveal']);
-
-        $persistence = $this->prophesize(SessionPersistenceInterface::class);
-        $persistence
-            ->persistSession(
-                Argument::that(function ($session) use ($persistence, $request) {
-                    $this->assertInstanceOf(LazySession::class, $session);
-                    $this->assertAttributeSame($persistence->reveal(), 'persistence', $session);
-                    $this->assertAttributeSame($request->reveal(), 'request', $session);
-                    return $session;
-                }),
-                Argument::that([$response, 'reveal'])
+            ->expects($this->exactly(2))
+            ->method('withAttribute')
+            ->withConsecutive(
+                [SessionMiddleware::SESSION_ATTRIBUTE, $this->isInstanceOf(LazySession::class)],
+                [SessionInterface::class, $this->isInstanceOf(LazySession::class)],
             )
-            ->will([$response, 'reveal']);
+            ->willReturnSelf();
 
-        $middleware = new SessionMiddleware($persistence->reveal());
-        $this->assertSame($response->reveal(), $middleware->process($request->reveal(), $handler->reveal()));
+        /** @var ResponseInterface&\PHPUnit\Framework\MockObject\MockObject $response */
+        $response = $this->createMock(ResponseInterface::class);
+
+        /** @var RequestHandlerInterface&\PHPUnit\Framework\MockObject\MockObject $handler */
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler
+            ->expects($this->once())
+            ->method('handle')
+            ->with($request)
+            ->willReturn($response);
+
+        /** @var SessionPersistenceInterface&\PHPUnit\Framework\MockObject\MockObject $persistence */
+        $persistence = $this->createMock(SessionPersistenceInterface::class);
+        $persistence
+            ->expects($this->once())
+            ->method('persistSession')
+            ->with(
+                $this->callback(function ($session) use ($persistence, $request) {
+                    return $session instanceof LazySession
+                        && $persistence === $this->getAttribute($session, 'persistence')
+                        && $request === $this->getAttribute($session, 'request');
+                }),
+                $response
+            )
+            ->willReturn($response);
+
+        $middleware = new SessionMiddleware($persistence);
+        $this->assertSame($response, $middleware->process($request, $handler));
     }
 }

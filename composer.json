@@ -27,8 +27,8 @@
         }
     },
     "require": {
-        "php": "^7.1",
-        "dflydev/fig-cookies": "^1.0.2 || ^2.0",
+        "php": "^7.3 || ~8.0.0",
+        "dflydev/fig-cookies": "^2.0.1",
         "laminas/laminas-zendframework-bridge": "^1.0",
         "psr/container": "^1.0",
         "psr/http-server-middleware": "^1.0"
@@ -36,10 +36,7 @@
     "require-dev": {
         "laminas/laminas-coding-standard": "~1.0.0",
         "laminas/laminas-diactoros": "^2.2",
-        "phpunit/phpunit": "^6.5.5"
-    },
-    "conflict": {
-        "phpspec/prophecy": "<1.7.2"
+        "phpunit/phpunit": "^9.3"
     },
     "suggest": {
         "mezzio/mezzio-csrf": "^1.0 || ^1.0-dev for CSRF protection capabilities",

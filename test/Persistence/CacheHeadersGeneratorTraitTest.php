@@ -36,7 +36,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         int $cacheExpire = 180,
         string $cacheLimiter = '',
         string $lastModified = null
-    ) {
+    ): object {
         return new class($cacheExpire, $cacheLimiter, $lastModified) {
 
             use CacheHeadersGeneratorTrait {
@@ -69,7 +69,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         };
     }
 
-    public function testLastModified()
+    public function testLastModified(): void
     {
         // test autodiscover lastModified value
         $consumer = $this->createConsumerInstance();
@@ -83,7 +83,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     /**
      * @dataProvider provideCacheHeaderValues
      */
-    public function testResponseAlreadyHasCacheHeaders($name, $value, $expected)
+    public function testResponseAlreadyHasCacheHeaders($name, $value, $expected): void
     {
         $consumer = $this->createConsumerInstance();
 
@@ -96,7 +96,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         self::assertFalse($consumer->responseAlreadyHasCacheHeaders($response));
     }
 
-    public function provideCacheHeaderValues()
+    public function provideCacheHeaderValues(): array
     {
         return [
             'expires'       => [ 'Expires', 'Sat, 14 Apr 1945 00:00:00 GMT', true],
@@ -107,56 +107,93 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         ];
     }
 
-    public function testDontAddCacheHeadersForEmptyOrUnsupportedCacheLimiter()
+    public function provideUnsupportedCacheLimiters(): array
     {
-        // do not add dataProvider for 2 cases
-        $cacheLimuiters = ['', 'unsupported'];
+        return [
+            'empty'       => [''],
+            'unsupported' => ['unsupported'],
+        ];
+    }
 
-        foreach ($cacheLimuiters as $cacheLimiter) {
-            $consumer = $this->createConsumerInstance(60, $cacheLimiter);
-            $response = $consumer->addCacheHeadersToResponse(new Response());
+    /**
+     * @dataProvider provideUnsupportedCacheLimiters
+     */
+    public function testDontAddCacheHeadersForEmptyOrUnsupportedCacheLimiter(string $cacheLimiter): void
+    {
+        $consumer = $this->createConsumerInstance(60, $cacheLimiter);
+        $response = $consumer->addCacheHeadersToResponse(new Response());
 
-            self::assertFalse($response->hasHeader('Expires'));
-            self::assertFalse($response->hasHeader('Last-Modified'));
-            self::assertFalse($response->hasHeader('Cache-Control'));
-            self::assertFalse($response->hasHeader('Pragma'));
+        self::assertFalse($response->hasHeader('Expires'));
+        self::assertFalse($response->hasHeader('Last-Modified'));
+        self::assertFalse($response->hasHeader('Cache-Control'));
+        self::assertFalse($response->hasHeader('Pragma'));
+    }
+
+    public function providePreexistingCacheHeaders(): iterable
+    {
+        yield 'last-modified' => [
+            'Last-Modified',
+            gmdate(Http::DATE_FORMAT),
+            [
+                'Pragma',
+                'Expires',
+                'Cache-Control',
+            ],
+        ];
+
+        yield 'cache-control' => [
+            'Cache-Control',
+            'public, max-age=3600',
+            [
+                'Pragma',
+                'Expires',
+                'Last-Modified',
+            ],
+        ];
+
+        yield 'pragma' => [
+            'Pragma',
+            'no-cache',
+            [
+                'Expires',
+                'Cache-Control',
+                'Last-Modified',
+            ],
+        ];
+
+        yield 'expires' => [
+            'Expires',
+            gmdate(Http::DATE_FORMAT),
+            [
+                'Pragma',
+                'Cache-Control',
+                'Last-Modified',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider providePreexistingCacheHeaders
+     * @param string[] $headersThatShouldNotBePresent
+     */
+    public function testDontAddExtraCacheHeadersIfResponseAlreadyHasAny(
+        string $headerName,
+        string $headerValue,
+        array $headersThatShouldNotBePresent
+    ): void {
+        $consumer = $this->createConsumerInstance(60, 'public');
+        $response = (new Response)->withHeader($headerName, $headerValue);
+        $response = $consumer->addCacheHeadersToResponse($response);
+        foreach ($headersThatShouldNotBePresent as $header) {
+            $this->assertFalse($response->hasHeader($header), sprintf(
+                'Response already containing header "%s" should not be injected with header "%s"',
+                $headerName,
+                $header
+            ));
         }
     }
 
-    public function testDontAddExtraCacheHeadersIfRespnseAlreadyHasAny()
-    {
-        $consumer = $this->createConsumerInstance(60, 'public');
-
-        // already has Last-Modified
-        $response = (new Response)->withHeader('Last-Modified', gmdate(Http::DATE_FORMAT));
-        $response = $consumer->addCacheHeadersToResponse($response);
-        $this->assertFalse($response->hasHeader('Pragma'));
-        $this->assertFalse($response->hasHeader('Expires'));
-        $this->assertFalse($response->hasHeader('Cache-Control'));
-
-        // already has Cache-Control
-        $response = (new Response)->withHeader('Cache-Control', 'public, max-age=3600');
-        $response = $consumer->addCacheHeadersToResponse($response);
-        $this->assertFalse($response->hasHeader('Pragma'));
-        $this->assertFalse($response->hasHeader('Expires'));
-        $this->assertFalse($response->hasHeader('Last-Modified'));
-
-        // already has Pragma
-        $response = (new Response)->withHeader('Pragma', 'no-cache');
-        $response = $consumer->addCacheHeadersToResponse($response);
-        $this->assertFalse($response->hasHeader('Expires'));
-        $this->assertFalse($response->hasHeader('Cache-Control'));
-        $this->assertFalse($response->hasHeader('Last-Modified'));
-
-        // already has Expires
-        $response = (new Response)->withHeader('Expires', gmdate(Http::DATE_FORMAT));
-        $response = $consumer->addCacheHeadersToResponse($response);
-        $this->assertFalse($response->hasHeader('Pragma'));
-        $this->assertFalse($response->hasHeader('Cache-Control'));
-        $this->assertFalse($response->hasHeader('Last-Modified'));
-    }
-
-    public function testAddCacheHeadersForNoCacheCacheLimiter()
+    public function testAddCacheHeadersForNoCacheCacheLimiter(): void
     {
         $consumer = $this->createConsumerInstance(60, 'nocache');
         $response = $consumer->addCacheHeadersToResponse(new Response());
@@ -167,7 +204,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         self::assertSame('no-cache', $response->getHeaderLine('Pragma'));
     }
 
-    public function testAddCacheHeadersForPublicCacheLimiter()
+    public function testAddCacheHeadersForPublicCacheLimiter(): void
     {
         $cacheExpire = 60;
         $maxAge      = 60 * $cacheExpire;
@@ -177,13 +214,13 @@ class CacheHeadersGeneratorTraitTest extends TestCase
 
         $lastModified = $this->getExpectedLastModified() ?: '';
 
-        self::assertRegExp(self::GMDATE_REGEXP, $response->getHeaderLine('Expires'));
+        self::assertMatchesRegularExpression(self::GMDATE_REGEXP, $response->getHeaderLine('Expires'));
         self::assertSame(sprintf('public, max-age=%d', $maxAge), $response->getHeaderLine('Cache-Control'));
         self::assertSame($lastModified, $response->getHeaderLine('Last-Modified'));
         self::assertFalse($response->hasHeader('Pragma'));
     }
 
-    public function testAddCacheHeadersForPrivateCacheLimiter()
+    public function testAddCacheHeadersForPrivateCacheLimiter(): void
     {
         $cacheExpire = 60;
         $maxAge      = 60 * $cacheExpire;
@@ -193,7 +230,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
 
         $lastModified = $this->getExpectedLastModified() ?: '';
 
-        self::assertRegExp(self::GMDATE_REGEXP, $response->getHeaderLine('Expires'));
+        self::assertMatchesRegularExpression(self::GMDATE_REGEXP, $response->getHeaderLine('Expires'));
         self::assertSame(sprintf('private, max-age=%d', $maxAge), $response->getHeaderLine('Cache-Control'));
         self::assertSame($lastModified, $response->getHeaderLine('Last-Modified'));
         self::assertFalse($response->hasHeader('Pragma'));
@@ -224,7 +261,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     {
         $cacheExpire  = 60;
         $maxAge       = (string) (60 * $cacheExpire);
-        $lastModified = $this->getLastModified();
+        $lastModified = $this->getExpectedLastModified();
 
         return [
             'empty' => [
