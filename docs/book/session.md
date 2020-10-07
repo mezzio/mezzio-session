@@ -181,8 +181,8 @@ to seed the session cookie lifetime, if present.
 Session containers will typically be passed to your middleware using the
 [SessionMiddleware](middleware.md), via the
 `Mezzio\Session\SessionMiddleware::SESSION_ATTRIBUTE` ("session") or the
-`Mezzio\Session\SessionInterface::class` ("Mezzio\Session\SessionInterface")
-request attribute.
+`Mezzio\Session\SessionInterface::class` ("Mezzio\Session\SessionInterface";
+available since version 1.4.0) request attribute.
 
 Once you have the container, you can check for data:
 
