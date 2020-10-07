@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.4.0 - TBD
+
+### Added
+
+- [#13](https://github.com/mezzio/mezzio-session/pull/13) adds support for PHP 7.4 and 8.0.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- [#13](https://github.com/mezzio/mezzio-session/pull/13) removes support for dflydev/fig-cookies versions prior to 2.0.1.
+
+- [#13](https://github.com/mezzio/mezzio-session/pull/13) removes support for PHP versions prior to 7.3.
+
+### Fixed
+
+- Nothing.
+
 ## 1.3.0 - 2019-10-16
 
 ### Added
