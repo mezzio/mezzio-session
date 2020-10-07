@@ -247,8 +247,6 @@ class CacheHeadersGeneratorTraitTest extends TestCase
 
     /**
      * @dataProvider provideCacheLimiterValues
-     *
-     * @return void
      */
     public function testResponseCacheHeadersToResponseWithValidCacheLimiters(
         int $cacheExpire,

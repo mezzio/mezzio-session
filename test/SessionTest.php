@@ -122,7 +122,7 @@ class SessionTest extends TestCase
      */
     public function serializedDataProvider(): array
     {
-        $data     = (object) ['test_case' => $this];
+        $data = (object) ['test_case' => $this];
         /** @var array $expected */
         $expected = json_decode(json_encode($data, JSON_PRESERVE_ZERO_FRACTION), true);
         return [

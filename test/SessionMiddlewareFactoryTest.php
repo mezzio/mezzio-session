@@ -10,7 +10,6 @@ declare(strict_types=1);
 
 namespace MezzioTest\Session;
 
-use Mezzio\Session\SessionMiddleware;
 use Mezzio\Session\SessionMiddlewareFactory;
 use Mezzio\Session\SessionPersistenceInterface;
 use PHPUnit\Framework\TestCase;
