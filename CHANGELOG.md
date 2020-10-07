@@ -2,19 +2,11 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 1.4.0 - TBD
+## 1.4.0 - 2020-10-07
 
 ### Added
 
 - [#13](https://github.com/mezzio/mezzio-session/pull/13) adds support for PHP 7.4 and 8.0.
-
-### Changed
-
-- Nothing.
-
-### Deprecated
-
-- Nothing.
 
 ### Removed
 
@@ -22,9 +14,25 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - [#13](https://github.com/mezzio/mezzio-session/pull/13) removes support for PHP versions prior to 7.3.
 
-### Fixed
 
-- Nothing.
+-----
+
+### Release Notes for [1.4.0](https://github.com/mezzio/mezzio-session/milestone/1)
+
+
+
+### 1.4.0
+
+- Total issues resolved: **2**
+- Total pull requests resolved: **4**
+- Total contributors: **3**
+
+#### Enhancement
+
+ - [14: Add Psalm integration](https://github.com/mezzio/mezzio-session/pull/14) thanks to @weierophinney and @boesing
+ - [13: Add PHP 8 support](https://github.com/mezzio/mezzio-session/pull/13) thanks to @weierophinney and @boesing
+ - [10: 1.4.x persistence traits addon](https://github.com/mezzio/mezzio-session/pull/10) thanks to @pine3ree
+ - [5: Add extra SessionInterface::class request attribute](https://github.com/mezzio/mezzio-session/pull/5) thanks to @pine3ree
 
 ## 1.3.0 - 2019-10-16
 
