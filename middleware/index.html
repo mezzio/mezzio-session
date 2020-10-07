@@ -209,7 +209,7 @@
             </div>
 
             
-            <div class="col-4 text-sm-right">
+            <div class="col-4 text-right">
                 
                     
 
@@ -322,11 +322,14 @@ class SessionMiddleware implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler) : ResponseInterface
     {
         $session = new LazySession($this-&gt;persistence, $request);
-        $response = $handler-&gt;handle($request-&gt;withAttribute(self::SESSION_ATTRIBUTE, $session));
+        $response = $handler-&gt;handle(
+            $request
+                -&gt;withAttribute(self::SESSION_ATTRIBUTE, $session)
+                -&gt;withAttribute(SessionInterface::class, $session)
+        );
         return $this-&gt;persistence-&gt;persistSession($session, $response);
     }
 }</code></pre>
-
 <h2 id="configuration">Configuration</h2>
 <p>This package provides a factory for <code>Mezzio\Session\SessionMiddleware</code>
 via <code>Mezzio\Session\SessionMiddlewareFactory</code>; this factory is
@@ -342,7 +345,6 @@ As an example, within Mezzio, you could pipe it in the <code>config/pipeline.php
 file:</p>
 <pre class="highlight"><code class="language-php">$app-&gt;pipe(\Mezzio\Session\SessionMiddleware::class);
 $app-&gt;pipe(\Mezzio\Router\Middleware\RouteMiddleware::class);</code></pre>
-
 <p>This will generally be an inexpensive operation; since the middleware uses a
 <code>LazySession</code> instance, unless your persistence implementation does any work in
 its constructor, the cost is just that of instantiating a few objects.</p>

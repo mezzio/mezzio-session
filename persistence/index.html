@@ -209,7 +209,7 @@
             </div>
 
             
-            <div class="col-4 text-sm-right">
+            <div class="col-4 text-right">
                 
                     
 
@@ -321,7 +321,6 @@ interface SessionPersistenceInterface
      */
     public function persistSession(SessionInterface $session, ResponseInterface $response) : ResponseInterface;
 }</code></pre>
-
 <p>Session initialization pulls data from the request (a cookie, a header value,
 etc.) in order to produce a session container. Session persistence pulls data
 from the session container, does something with it, and then optionally provides
@@ -385,7 +384,6 @@ TTL value:</p>
 <pre class="highlight"><code class="language-php">$ttl = $session instanceof SessionContainerPersistenceInterface
     ? $session-&gt;getSessionLifetime()
     : $defaultLifetime; // likely 0, to indicate automatic expiry</code></pre>
-
 <p><code>getSessionLifetime()</code> returns an <code>integer</code> value indicating the number of
 seconds the session should persist.</p>
 
