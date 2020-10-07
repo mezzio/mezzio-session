@@ -19,8 +19,6 @@ use Mezzio\Session\SessionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use function class_exists;
-use function method_exists;
 use function time;
 
 /**
@@ -112,11 +110,7 @@ trait SessionCookieAwareTrait
             ->withSecure($this->cookieSecure)
             ->withHttpOnly($this->cookieHttpOnly);
 
-        if (
-            $this->cookieSameSite
-            && method_exists($sessionCookie, 'withSameSite')
-            && class_exists(SameSite::class)
-        ) {
+        if ($this->cookieSameSite) {
             $sessionCookie = $sessionCookie->withSameSite(
                 SameSite::fromString($this->cookieSameSite)
             );
