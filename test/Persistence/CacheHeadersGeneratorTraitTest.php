@@ -247,6 +247,8 @@ class CacheHeadersGeneratorTraitTest extends TestCase
 
     /**
      * @dataProvider provideCacheLimiterValues
+     *
+     * @return void
      */
     public function testResponseCacheHeadersToResponseWithValidCacheLimiters(
         int $cacheExpire,
@@ -255,7 +257,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         string $expectedLastModified,
         string $expectedCacheControl,
         string $expectedPragma
-    ) {
+    ): void {
         $consumer = $this->createConsumerInstance($cacheExpire, $cacheLimiter);
 
         $response = $consumer->addCacheHeadersToResponse(new Response());

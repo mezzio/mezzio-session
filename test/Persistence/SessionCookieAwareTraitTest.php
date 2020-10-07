@@ -352,6 +352,7 @@ class SessionCookieAwareTraitTest extends TestCase
         $response = $consumer->addSessionCookieHeaderToResponse(new Response(), $cookieValue, $session);
 
         $cookieString  = $response->getHeaderLine('Set-Cookie');
+        $this->assertIsString($cookieString);
         $expiresString = 'Expires=Thu, 01 Jan 1970 00:00:01 GMT';
         $this->assertNotFalse(strpos($cookieString, $expiresString), 'cookie should bet set to expire in the past');
     }

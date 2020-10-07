@@ -78,7 +78,7 @@ class SessionMiddlewareTest extends TestCase
             ->expects($this->once())
             ->method('persistSession')
             ->with(
-                $this->callback(function ($session) use ($persistence, $request) {
+                $this->callback(function (SessionInterface $session) use ($persistence, $request) {
                     return $session instanceof LazySession
                         && $persistence === $this->getAttribute($session, 'persistence')
                         && $request === $this->getAttribute($session, 'request');

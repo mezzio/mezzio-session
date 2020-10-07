@@ -41,7 +41,7 @@ class SessionTest extends TestCase
         $this->assertFalse($session->isRegenerated());
     }
 
-    public function testRegenerateProducesANewInstance(): Session
+    public function testRegenerateProducesANewInstance(): SessionInterface
     {
         $session     = new Session([]);
         $regenerated = $session->regenerate();
@@ -114,11 +114,20 @@ class SessionTest extends TestCase
         $this->assertSame([], $session->toArray());
     }
 
-    public function serializedDataProvider(): iterable
+    /**
+     * @psalm-return array<
+     *     string,
+     *     array{\stdClass, array<array-key, mixed>}
+     * >
+     */
+    public function serializedDataProvider(): array
     {
         $data     = (object) ['test_case' => $this];
+        /** @var array $expected */
         $expected = json_decode(json_encode($data, JSON_PRESERVE_ZERO_FRACTION), true);
-        yield 'nested-objects' => [$data, $expected];
+        return [
+            'nested-objects' => [$data, $expected],
+        ];
     }
 
     /**
