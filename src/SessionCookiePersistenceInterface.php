@@ -29,7 +29,7 @@ namespace Mezzio\Session;
  */
 interface SessionCookiePersistenceInterface
 {
-    const SESSION_LIFETIME_KEY = '__SESSION_TTL__';
+    public const SESSION_LIFETIME_KEY = '__SESSION_TTL__';
 
     /**
      * Define how long the session cookie should live.
@@ -48,7 +48,7 @@ interface SessionCookiePersistenceInterface
      *
      * @param int $duration Number of seconds the cookie should persist for.
      */
-    public function persistSessionFor(int $duration) : void;
+    public function persistSessionFor(int $duration): void;
 
     /**
      * Determine how long the session cookie should live.
@@ -66,5 +66,5 @@ interface SessionCookiePersistenceInterface
      *   and return it here. Typically, this value should be communicated via
      *   the SESSION_LIFETIME_KEY value of the session.
      */
-    public function getSessionLifetime() : int;
+    public function getSessionLifetime(): int;
 }

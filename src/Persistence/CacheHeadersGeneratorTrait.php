@@ -48,13 +48,13 @@ trait CacheHeadersGeneratorTrait
         'private_no_expire' => true,
     ];
 
-    /** @var false|string */
+    /** @var bool|string */
     private $lastModified;
 
     /**
      * Add cache headers to the response when needed.
      */
-    private function addCacheHeadersToResponse(ResponseInterface $response) : ResponseInterface
+    private function addCacheHeadersToResponse(ResponseInterface $response): ResponseInterface
     {
         if (! $this->cacheLimiter || $this->responseAlreadyHasCacheHeaders($response)) {
             return $response;
@@ -74,7 +74,7 @@ trait CacheHeadersGeneratorTrait
      * Generate cache http headers for this instance's session cache-limiter and
      * cache-expire values.
      */
-    private function generateCacheHeaders() : array
+    private function generateCacheHeaders(): array
     {
         // Unsupported cache_limiter => do not generate cache headers
         if (! isset(self::$supportedCacheLimiters[$this->cacheLimiter])) {
@@ -131,7 +131,7 @@ trait CacheHeadersGeneratorTrait
             return $this->lastModified;
         }
 
-        $lastmod = getlastmod() ?: filemtime(__FILE__);
+        $lastmod            = getlastmod() ?: filemtime(__FILE__);
         $this->lastModified = $lastmod ? gmdate(Http::DATE_FORMAT, $lastmod) : false;
 
         return $this->lastModified;
@@ -140,7 +140,7 @@ trait CacheHeadersGeneratorTrait
     /**
      * Check if the response already carries cache headers
      */
-    private function responseAlreadyHasCacheHeaders(ResponseInterface $response) : bool
+    private function responseAlreadyHasCacheHeaders(ResponseInterface $response): bool
     {
         return $response->hasHeader('Expires')
             || $response->hasHeader('Last-Modified')

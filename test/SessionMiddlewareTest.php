@@ -50,7 +50,7 @@ class SessionMiddlewareTest extends TestCase
 
     public function testMiddlewareCreatesLazySessionAndPassesItToDelegateAndPersistsSessionInResponse(): void
     {
-        /** @var ServerRequestInterface&\PHPUnit\Framework\MockObject\MockObject $request */
+        /** @psalm-var ServerRequestInterface&\PHPUnit\Framework\MockObject\MockObject $request */
         $request = $this->createMock(ServerRequestInterface::class);
         $request
             ->expects($this->exactly(2))
@@ -61,10 +61,10 @@ class SessionMiddlewareTest extends TestCase
             )
             ->willReturnSelf();
 
-        /** @var ResponseInterface&\PHPUnit\Framework\MockObject\MockObject $response */
+        /** @psalm-var ResponseInterface&\PHPUnit\Framework\MockObject\MockObject $response */
         $response = $this->createMock(ResponseInterface::class);
 
-        /** @var RequestHandlerInterface&\PHPUnit\Framework\MockObject\MockObject $handler */
+        /** @psalm-var RequestHandlerInterface&\PHPUnit\Framework\MockObject\MockObject $handler */
         $handler = $this->createMock(RequestHandlerInterface::class);
         $handler
             ->expects($this->once())
@@ -72,7 +72,7 @@ class SessionMiddlewareTest extends TestCase
             ->with($request)
             ->willReturn($response);
 
-        /** @var SessionPersistenceInterface&\PHPUnit\Framework\MockObject\MockObject $persistence */
+        /** @psalm-var SessionPersistenceInterface&\PHPUnit\Framework\MockObject\MockObject $persistence */
         $persistence = $this->createMock(SessionPersistenceInterface::class);
         $persistence
             ->expects($this->once())

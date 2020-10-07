@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 namespace Mezzio\Session;
 
+use stdClass;
+
 use function array_key_exists;
 use function json_decode;
 use function json_encode;
@@ -41,9 +43,7 @@ class Session implements
      */
     private $id;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     private $isRegenerated = false;
 
     /**
@@ -63,7 +63,7 @@ class Session implements
     public function __construct(array $data, string $id = '')
     {
         $this->data = $this->originalData = $data;
-        $this->id = $id;
+        $this->id   = $id;
 
         if (isset($data[SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY])) {
             $this->sessionLifetime = $data[SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY];
@@ -77,7 +77,7 @@ class Session implements
      * within a session are serializable across any session adapter.
      *
      * @param mixed $value
-     * @return null|bool|int|float|string|array|\stdClass
+     * @return null|bool|int|float|string|array|stdClass
      */
     public static function extractSerializableValue($value)
     {
@@ -87,13 +87,13 @@ class Session implements
     /**
      * Retrieve all data for purposes of persistence.
      */
-    public function toArray() : array
+    public function toArray(): array
     {
         return $this->data;
     }
 
     /**
-     * @param mixed $default Default value to return if $name does not exist.
+     * @param null|mixed $default Default value to return if $name does not exist.
      * @return mixed
      */
     public function get(string $name, $default = null)
@@ -101,7 +101,7 @@ class Session implements
         return $this->data[$name] ?? $default;
     }
 
-    public function has(string $name) : bool
+    public function has(string $name): bool
     {
         return array_key_exists($name, $this->data);
     }
@@ -109,22 +109,22 @@ class Session implements
     /**
      * @param mixed $value
      */
-    public function set(string $name, $value) : void
+    public function set(string $name, $value): void
     {
         $this->data[$name] = self::extractSerializableValue($value);
     }
 
-    public function unset(string $name) : void
+    public function unset(string $name): void
     {
         unset($this->data[$name]);
     }
 
-    public function clear() : void
+    public function clear(): void
     {
         $this->data = [];
     }
 
-    public function hasChanged() : bool
+    public function hasChanged(): bool
     {
         if ($this->isRegenerated) {
             return true;
@@ -133,14 +133,14 @@ class Session implements
         return $this->data !== $this->originalData;
     }
 
-    public function regenerate() : SessionInterface
+    public function regenerate(): SessionInterface
     {
-        $session = clone $this;
+        $session                = clone $this;
         $session->isRegenerated = true;
         return $session;
     }
 
-    public function isRegenerated() : bool
+    public function isRegenerated(): bool
     {
         return $this->isRegenerated;
     }
@@ -150,7 +150,7 @@ class Session implements
      *
      * @since 1.1.0
      */
-    public function getId() : string
+    public function getId(): string
     {
         return $this->id;
     }
@@ -160,7 +160,7 @@ class Session implements
      *
      * @since 1.2.0
      */
-    public function persistSessionFor(int $duration) : void
+    public function persistSessionFor(int $duration): void
     {
         $this->sessionLifetime = $duration;
         $this->set(SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY, $duration);
@@ -171,7 +171,7 @@ class Session implements
      *
      * @since 1.2.0
      */
-    public function getSessionLifetime() : int
+    public function getSessionLifetime(): int
     {
         return $this->sessionLifetime;
     }

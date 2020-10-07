@@ -14,21 +14,25 @@ use Dflydev\FigCookies\Cookie;
 use Dflydev\FigCookies\FigRequestCookies;
 use Dflydev\FigCookies\Modifier\SameSite;
 use Dflydev\FigCookies\SetCookie;
-use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Response;
+use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\ServerRequestFactory;
 use Mezzio\Session\Persistence\SessionCookieAwareTrait;
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
+use function class_exists;
+use function method_exists;
+use function sprintf;
 use function strpos;
+use function urlencode;
 
 class SessionCookieAwareTraitTest extends TestCase
 {
-    const EXPIRE_REGEXP = '/'
+    public const EXPIRE_REGEXP = '/'
         . 'Expires\='
         . '(Sun|Mon|Tue|Wed|Thu|Fri|Sat), '
         . '[0-3][0-9] '
@@ -38,30 +42,30 @@ class SessionCookieAwareTraitTest extends TestCase
         . 'GMT'
     . '/i';
 
-    private const COOKIE_NAME = 'SESSIONCOOKIENAME';
-    private const COOKIE_LIFETIME = 0;
-    private const COOKIE_PATH = '/';
-    private const COOKIE_DOMAIN = null;
-    private const COOKIE_SECURE = false;
-    private const COOKIE_HTTPONLY = false;
-    private const COOKIE_SAMESITE = '';
+    private const COOKIE_NAME                    = 'SESSIONCOOKIENAME';
+    private const COOKIE_LIFETIME                = 0;
+    private const COOKIE_PATH                    = '/';
+    private const COOKIE_DOMAIN                  = null;
+    private const COOKIE_SECURE                  = false;
+    private const COOKIE_HTTPONLY                = false;
+    private const COOKIE_SAMESITE                = '';
     private const DELETE_COOKIE_ON_EMPTY_SESSION = false;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
     }
 
     protected function createConsumerInstance(
-        string $cookieName = null,
-        int $cookieLifetime = null,
-        string $cookiePath = null,
-        string $cookieDomain = null,
-        bool $cookieSecure = null,
-        bool $cookieHttpOnly = null,
-        string $cookieSameSite = null,
-        bool $deleteCookieOnEmptySession = null
+        ?string $cookieName = null,
+        ?int $cookieLifetime = null,
+        ?string $cookiePath = null,
+        ?string $cookieDomain = null,
+        ?bool $cookieSecure = null,
+        ?bool $cookieHttpOnly = null,
+        ?string $cookieSameSite = null,
+        ?bool $deleteCookieOnEmptySession = null
     ): object {
-        return new class(
+        return new class (
             $cookieName ?? self::COOKIE_NAME,
             $cookieLifetime ?? self::COOKIE_LIFETIME,
             $cookiePath ?? self::COOKIE_PATH,
@@ -83,23 +87,23 @@ class SessionCookieAwareTraitTest extends TestCase
                 string $cookieName,
                 int $cookieLifetime = 0,
                 string $cookiePath = '/',
-                string $cookieDomain = null,
+                ?string $cookieDomain = null,
                 bool $cookieSecure = false,
                 bool $cookieHttpOnly = false,
                 string $cookieSameSite = '',
                 bool $deleteCookieOnEmptySession = false
             ) {
-                $this->cookieName     = $cookieName;
-                $this->cookieLifetime = $cookieLifetime;
-                $this->cookiePath     = $cookiePath;
-                $this->cookieDomain   = $cookieDomain;
-                $this->cookieSecure   = $cookieSecure;
-                $this->cookieHttpOnly = $cookieHttpOnly;
-                $this->cookieSameSite = $cookieSameSite;
+                $this->cookieName                 = $cookieName;
+                $this->cookieLifetime             = $cookieLifetime;
+                $this->cookiePath                 = $cookiePath;
+                $this->cookieDomain               = $cookieDomain;
+                $this->cookieSecure               = $cookieSecure;
+                $this->cookieHttpOnly             = $cookieHttpOnly;
+                $this->cookieSameSite             = $cookieSameSite;
                 $this->deleteCookieOnEmptySession = $deleteCookieOnEmptySession;
             }
 
-            public function getSessionCookieValueFromRequest(ServerRequestInterface $request) : string
+            public function getSessionCookieValueFromRequest(ServerRequestInterface $request): string
             {
                 return $this->trait_getSessionCookieValueFromRequest($request);
             }
@@ -108,21 +112,21 @@ class SessionCookieAwareTraitTest extends TestCase
                 ResponseInterface $response,
                 string $cookieValue,
                 SessionInterface $session
-            ) : ResponseInterface {
+            ): ResponseInterface {
                 return $this->trait_addSessionCookieHeaderToResponse($response, $cookieValue, $session);
             }
 
-            public function createSessionCookieForResponse(string $cookieValue, int $cookieLifetime = 0) : SetCookie
+            public function createSessionCookieForResponse(string $cookieValue, int $cookieLifetime = 0): SetCookie
             {
                 return $this->trait_createSessionCookieForResponse($cookieValue, $cookieLifetime);
             }
 
-            public function getSessionCookieLifetime(SessionInterface $session) : int
+            public function getSessionCookieLifetime(SessionInterface $session): int
             {
                 return $this->trait_getSessionCookieLifetime($session);
             }
 
-            public function isDeleteCookieOnEmptySession() : bool
+            public function isDeleteCookieOnEmptySession(): bool
             {
                 return $this->trait_isDeleteCookieOnEmptySession();
             }
@@ -134,8 +138,8 @@ class SessionCookieAwareTraitTest extends TestCase
      */
     public function testGetSessionCookieValueFromRequestUsingInjectesCookieParams(
         string $cookieName,
-        string $cookieValue = null,
-        string $expected = null
+        ?string $cookieValue = null,
+        ?string $expected = null
     ): void {
         $consumer = $this->createConsumerInstance($cookieName);
 
@@ -150,12 +154,12 @@ class SessionCookieAwareTraitTest extends TestCase
      */
     public function testGetSessionCookieValueFromRequestUsingInjectedCookieHeader(
         string $cookieName,
-        string $cookieValue = null,
-        string $expected = null
+        ?string $cookieValue = null,
+        ?string $expected = null
     ): void {
         $consumer = $this->createConsumerInstance($cookieName);
 
-        $cookie = Cookie::create($cookieName, $cookieValue);
+        $cookie  = Cookie::create($cookieName, $cookieValue);
         $request = FigRequestCookies::set(new ServerRequest(), $cookie);
 
         self::assertSame($expected, $consumer->getSessionCookieValueFromRequest($request));
@@ -176,8 +180,8 @@ class SessionCookieAwareTraitTest extends TestCase
 
     public function testAddSessionCookieHeaderToResponse(): void
     {
-        $cookieName  = 'ADDSESSIONCOOKIEID';
-        $cookieValue = 'set-some-cookie-value';
+        $cookieName      = 'ADDSESSIONCOOKIEID';
+        $cookieValue     = 'set-some-cookie-value';
         $sessionLifetime = 3600;
 
         $consumer = $this->createConsumerInstance($cookieName);
@@ -202,7 +206,7 @@ class SessionCookieAwareTraitTest extends TestCase
         int $cookieLifetime,
         string $expectedHeaderLine
     ): void {
-        $consumer = $this->createConsumerInstance($cookieName);
+        $consumer  = $this->createConsumerInstance($cookieName);
         $setCookie = $consumer->createSessionCookieForResponse(
             $cookieValue ?? '',
             $cookieLifetime ?? 0
@@ -220,7 +224,7 @@ class SessionCookieAwareTraitTest extends TestCase
         $cookieWeirdValue = '!"£$%&/';
 
         return [
-            [$cookieName, null,              0, sprintf('%s=; Path=/',   $cookieName)],
+            [$cookieName, null,              0, sprintf('%s=; Path=/', $cookieName)],
             [$cookieName, $cookieNiceValue,  0, sprintf('%s=%s; Path=/', $cookieName, $cookieNiceValue)],
             [$cookieName, $cookieWeirdValue, 0, sprintf('%s=%s; Path=/', $cookieName, urlencode($cookieWeirdValue))],
         ];
@@ -305,9 +309,9 @@ class SessionCookieAwareTraitTest extends TestCase
      * @dataProvider provideSessionCookieLifetimeValues
      */
     public function testGetSessionCookieLifetimeReturnsExpectedResults(
-        int $cookieLifetime = null,
-        int $sessionLifetime = null,
-        int $expected = null
+        ?int $cookieLifetime = null,
+        ?int $sessionLifetime = null,
+        ?int $expected = null
     ): void {
         $consumer = $this->createConsumerInstance('SESSIONCOOKIENAME', $cookieLifetime ?? 0);
         $session  = new Session([]);

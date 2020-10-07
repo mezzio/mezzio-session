@@ -23,5 +23,5 @@ interface SessionIdentifierAwareInterface
      *
      * @since 1.1.0
      */
-    public function getId() : string;
+    public function getId(): string;
 }

@@ -11,27 +11,36 @@ declare(strict_types=1);
 namespace MezzioTest\Session\LazySessionTest;
 
 use Mezzio\Session\Exception\NotInitializableException;
-use Mezzio\Session\InitializePersistenceIdInterface;
 use Mezzio\Session\LazySession;
 use Mezzio\Session\Session;
-use Mezzio\Session\SessionCookiePersistenceInterface;
-use Mezzio\Session\SessionIdentifierAwareInterface;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionPersistenceInterface;
 use MezzioTest\Session\TestAsset\SessionInitializationPersistenceInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionProperty;
 
 class LazySessionTest extends TestCase
 {
-    /** @var SessionInterface&\PHPUnit\Framework\MockObject\MockObject */
+    /**
+     * @var SessionInterface|MockObject
+     * @psalm-var SessionInterface&MockObject
+     */
     private $proxy;
-    /** @var SessionPersistenceInterface&\PHPUnit\Framework\MockObject\MockObject */
+
+    /**
+     * @var SessionPersistenceInterface|MockObject
+     * @psalm-var SessionPersistenceInterface&MockObject
+     */
     private $persistence;
-    /** @var ServerRequestInterface&\PHPUnit\Framework\MockObject\MockObject */
+
+    /**
+     * @var ServerRequestInterface|MockObject
+     * @psalm-var ServerRequestInterface&MockObject
+     */
     private $request;
+
     /** @var LazySession */
     private $session;
 
@@ -44,8 +53,10 @@ class LazySessionTest extends TestCase
     }
 
     /**
-     * @param SessionPersistenceInterface&\PHPUnit\Framework\MockObject\MockObject $persistence
-     * @param ServerRequestInterface&\PHPUnit\Framework\MockObject\MockObject $request
+     * @param SessionPersistenceInterface|MockObject $persistence
+     * @param ServerRequestInterface|MockObject      $request
+     * @psalm-param SessionPersistenceInterface&MockObject $persistence
+     * @psalm-param ServerRequestInterface&MockObject      $request
      */
     public function assertProxyCreated($persistence, $request): void
     {
@@ -257,7 +268,7 @@ class LazySessionTest extends TestCase
         $this->assertProxyCreated($persistence, $this->request);
 
         $session = new LazySession($persistence, $this->request);
-        $actual = $session->initializeId();
+        $actual  = $session->initializeId();
 
         $r = new ReflectionProperty($session, 'proxiedSession');
         $r->setAccessible(true);

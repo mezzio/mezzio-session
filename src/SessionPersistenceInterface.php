@@ -18,7 +18,7 @@ interface SessionPersistenceInterface
     /**
      * Generate a session data instance based on the request.
      */
-    public function initializeSessionFromRequest(ServerRequestInterface $request) : SessionInterface;
+    public function initializeSessionFromRequest(ServerRequestInterface $request): SessionInterface;
 
     /**
      * Persist the session data instance.
@@ -26,5 +26,5 @@ interface SessionPersistenceInterface
      * Persists the session data, returning a response instance with any
      * artifacts required to return to the client.
      */
-    public function persistSession(SessionInterface $session, ResponseInterface $response) : ResponseInterface;
+    public function persistSession(SessionInterface $session, ResponseInterface $response): ResponseInterface;
 }

@@ -69,7 +69,7 @@ trait SessionCookieAwareTrait
      * In each case, if the value is not found, it falls back to generating a
      * new session identifier.
      */
-    private function getSessionCookieValueFromRequest(ServerRequestInterface $request) : string
+    private function getSessionCookieValueFromRequest(ServerRequestInterface $request): string
     {
         if ('' === $request->getHeaderLine('Cookie')) {
             return $request->getCookieParams()[$this->cookieName] ?? '';
@@ -87,7 +87,7 @@ trait SessionCookieAwareTrait
         ResponseInterface $response,
         string $cookieValue,
         SessionInterface $session
-    ) : ResponseInterface {
+    ): ResponseInterface {
         return FigResponseCookies::set(
             $response,
             $this->createSessionCookieForResponse(
@@ -101,9 +101,9 @@ trait SessionCookieAwareTrait
      * Build a SetCookie instance for client session persistence.
      *
      * @param string $cookieValue The cookie value
-     * @param int|null $cookieLifetime A session cookie lifetime other than the default
+     * @param int    $cookieLifetime A session cookie lifetime other than the default
      */
-    private function createSessionCookieForResponse(string $cookieValue, int $cookieLifetime = 0) : SetCookie
+    private function createSessionCookieForResponse(string $cookieValue, int $cookieLifetime = 0): SetCookie
     {
         $sessionCookie = SetCookie::create($this->cookieName)
             ->withValue($cookieValue)
@@ -112,7 +112,8 @@ trait SessionCookieAwareTrait
             ->withSecure($this->cookieSecure)
             ->withHttpOnly($this->cookieHttpOnly);
 
-        if ($this->cookieSameSite
+        if (
+            $this->cookieSameSite
             && method_exists($sessionCookie, 'withSameSite')
             && class_exists(SameSite::class)
         ) {
@@ -130,14 +131,15 @@ trait SessionCookieAwareTrait
         return $sessionCookie;
     }
 
-    private function getSessionCookieLifetime(SessionInterface $session) : int
+    private function getSessionCookieLifetime(SessionInterface $session): int
     {
         if ($this->deleteCookieOnEmptySession && ! $session->toArray()) {
             return -(time() - 1);
         }
 
         $lifetime = (int) $this->cookieLifetime;
-        if ($session instanceof SessionCookiePersistenceInterface
+        if (
+            $session instanceof SessionCookiePersistenceInterface
             && $session->has(SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY)
         ) {
             $lifetime = $session->getSessionLifetime();
@@ -148,6 +150,7 @@ trait SessionCookieAwareTrait
 
     /**
      * @internal
+     *
      * @return bool whether we delete cookie from browser when session becomes empty
      */
     public function isDeleteCookieOnEmptySession(): bool

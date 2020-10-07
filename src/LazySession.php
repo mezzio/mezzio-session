@@ -27,14 +27,10 @@ final class LazySession implements
     SessionInterface,
     InitializeSessionIdInterface
 {
-    /**
-     * @var SessionPersistenceInterface
-     */
+    /** @var SessionPersistenceInterface */
     private $persistence;
 
-    /**
-     * @var null|SessionInterface
-     */
+    /** @var null|SessionInterface */
     private $proxiedSession;
 
     /**
@@ -47,16 +43,16 @@ final class LazySession implements
     public function __construct(SessionPersistenceInterface $persistence, ServerRequestInterface $request)
     {
         $this->persistence = $persistence;
-        $this->request = $request;
+        $this->request     = $request;
     }
 
-    public function regenerate() : SessionInterface
+    public function regenerate(): SessionInterface
     {
         $this->proxiedSession = $this->getProxiedSession()->regenerate();
         return $this;
     }
 
-    public function isRegenerated() : bool
+    public function isRegenerated(): bool
     {
         if (! $this->proxiedSession) {
             return false;
@@ -65,37 +61,44 @@ final class LazySession implements
         return $this->proxiedSession->isRegenerated();
     }
 
-    public function toArray() : array
+    public function toArray(): array
     {
         return $this->getProxiedSession()->toArray();
     }
 
+    /**
+     * @param null|mixed $default
+     * @return mixed
+     */
     public function get(string $name, $default = null)
     {
         return $this->getProxiedSession()->get($name, $default);
     }
 
-    public function has(string $name) : bool
+    public function has(string $name): bool
     {
         return $this->getProxiedSession()->has($name);
     }
 
-    public function set(string $name, $value) : void
+    /**
+     * @param mixed $value
+     */
+    public function set(string $name, $value): void
     {
         $this->getProxiedSession()->set($name, $value);
     }
 
-    public function unset(string $name) : void
+    public function unset(string $name): void
     {
         $this->getProxiedSession()->unset($name);
     }
 
-    public function clear() : void
+    public function clear(): void
     {
         $this->getProxiedSession()->clear();
     }
 
-    public function hasChanged() : bool
+    public function hasChanged(): bool
     {
         if (! $this->proxiedSession) {
             return false;
@@ -113,7 +116,7 @@ final class LazySession implements
      *
      * @since 1.1.0
      */
-    public function getId() : string
+    public function getId(): string
     {
         $proxiedSession = $this->getProxiedSession();
         return $proxiedSession instanceof SessionIdentifierAwareInterface
@@ -126,7 +129,7 @@ final class LazySession implements
      *
      * @since 1.2.0
      */
-    public function persistSessionFor(int $duration) : void
+    public function persistSessionFor(int $duration): void
     {
         $proxiedSession = $this->getProxiedSession();
         if ($proxiedSession instanceof SessionCookiePersistenceInterface) {
@@ -139,7 +142,7 @@ final class LazySession implements
      *
      * @since 1.2.0
      */
-    public function getSessionLifetime() : int
+    public function getSessionLifetime(): int
     {
         $proxiedSession = $this->getProxiedSession();
         return $proxiedSession instanceof SessionCookiePersistenceInterface
@@ -157,8 +160,7 @@ final class LazySession implements
         return $this->proxiedSession->getId();
     }
 
-
-    private function getProxiedSession() : SessionInterface
+    private function getProxiedSession(): SessionInterface
     {
         if ($this->proxiedSession) {
             return $this->proxiedSession;

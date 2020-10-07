@@ -17,9 +17,15 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use ReflectionClass;
 
+use function filemtime;
+use function getlastmod;
+use function gmdate;
+use function sprintf;
+use function time;
+
 class CacheHeadersGeneratorTraitTest extends TestCase
 {
-    const GMDATE_REGEXP = '/^'
+    public const GMDATE_REGEXP = '/^'
         . '(Sun|Mon|Tue|Wed|Thu|Fri|Sat), '
         . '[0-3][0-9] '
         . '(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) '
@@ -28,41 +34,41 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         . 'GMT'
     . '$/';
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
     }
 
     protected function createConsumerInstance(
         int $cacheExpire = 180,
         string $cacheLimiter = '',
-        string $lastModified = null
+        ?string $lastModified = null
     ): object {
-        return new class($cacheExpire, $cacheLimiter, $lastModified) {
-
+        return new class ($cacheExpire, $cacheLimiter, $lastModified) {
             use CacheHeadersGeneratorTrait {
                 addCacheHeadersToResponse as trait_addCacheHeadersToResponse;
                 responseAlreadyHasCacheHeaders as trait_responseAlreadyHasCacheHeaders;
                 getLastModified as trait_getLastModified;
             }
 
-            public function __construct(int $cacheExpire, string $cacheLimiter, string $lastModified = null)
+            public function __construct(int $cacheExpire, string $cacheLimiter, ?string $lastModified = null)
             {
                 $this->cacheExpire  = $cacheExpire;
                 $this->cacheLimiter = $cacheLimiter;
                 $this->lastModified = $lastModified;
             }
 
-            public function addCacheHeadersToResponse(ResponseInterface $response) : ResponseInterface
+            public function addCacheHeadersToResponse(ResponseInterface $response): ResponseInterface
             {
                 return $this->trait_addCacheHeadersToResponse($response);
             }
 
+            /** @return string|false */
             public function getLastModified()
             {
                 return $this->trait_getLastModified();
             }
 
-            public function responseAlreadyHasCacheHeaders(ResponseInterface $response) : bool
+            public function responseAlreadyHasCacheHeaders(ResponseInterface $response): bool
             {
                 return $this->trait_responseAlreadyHasCacheHeaders($response);
             }
@@ -83,8 +89,11 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     /**
      * @dataProvider provideCacheHeaderValues
      */
-    public function testResponseAlreadyHasCacheHeaders($name, $value, $expected): void
-    {
+    public function testResponseAlreadyHasCacheHeaders(
+        string $name,
+        string $value,
+        bool $expected
+    ): void {
         $consumer = $this->createConsumerInstance();
 
         $response = new Response();
@@ -99,11 +108,11 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     public function provideCacheHeaderValues(): array
     {
         return [
-            'expires'       => [ 'Expires', 'Sat, 14 Apr 1945 00:00:00 GMT', true],
-            'last-modified' => [ 'Last-Modified', 'Sat, 25 Mar 1972 00:00:00 GMT', true],
-            'cache-control' => [ 'Cache-Control', 'private, max-age=3600', true],
-            'pragma'        => [ 'Pragma', 'no-cache', true],
-            'other-header'  => [ 'Content-Language', 'en', false],
+            'expires'       => ['Expires', 'Sat, 14 Apr 1945 00:00:00 GMT', true],
+            'last-modified' => ['Last-Modified', 'Sat, 25 Mar 1972 00:00:00 GMT', true],
+            'cache-control' => ['Cache-Control', 'private, max-age=3600', true],
+            'pragma'        => ['Pragma', 'no-cache', true],
+            'other-header'  => ['Content-Language', 'en', false],
         ];
     }
 
@@ -182,7 +191,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         array $headersThatShouldNotBePresent
     ): void {
         $consumer = $this->createConsumerInstance(60, 'public');
-        $response = (new Response)->withHeader($headerName, $headerValue);
+        $response = (new Response())->withHeader($headerName, $headerValue);
         $response = $consumer->addCacheHeadersToResponse($response);
         foreach ($headersThatShouldNotBePresent as $header) {
             $this->assertFalse($response->hasHeader($header), sprintf(
@@ -236,73 +245,73 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         self::assertFalse($response->hasHeader('Pragma'));
     }
 
-//    /**
-//     * @dataProvider provideCacheLimiterValues
-//     */
-//    public function testResponseCacheHeadersToResponseWithValidCacheLimiters(
-//        $cacheExpire,
-//        $cacheLimiter,
-//        $expected_expires,
-//        $expected_lastModified,
-//        $expected_cacheControl,
-//        $expected_pragma
-//    ) {
-//        $consumer = $this->createConsumerInstance($cacheExpire, $cacheLimiter);
-//
-//        $response = $consumer->addCacheHeadersToResponse(new Response());
-//
-//        self::assertSame($expected_expires,      $response->getHeaderLine('Expires'));
-//        self::assertSame($expected_lastModified, $response->getHeaderLine('Last-Modified'));
-//        self::assertSame($expected_cacheControl, $response->getHeaderLine('Cache-Control'));
-//        self::assertSame($expected_pragma,       $response->getHeaderLine('Pragma'));
-//    }
+    /**
+     * @dataProvider provideCacheLimiterValues
+     */
+    public function testResponseCacheHeadersToResponseWithValidCacheLimiters(
+        int $cacheExpire,
+        string $cacheLimiter,
+        string $expectedExpires,
+        string $expectedLastModified,
+        string $expectedCacheControl,
+        string $expectedPragma
+    ) {
+        $consumer = $this->createConsumerInstance($cacheExpire, $cacheLimiter);
 
-    public function provideCacheLimiterValues()
+        $response = $consumer->addCacheHeadersToResponse(new Response());
+
+        self::assertSame($expectedExpires, $response->getHeaderLine('Expires'));
+        self::assertSame($expectedLastModified, $response->getHeaderLine('Last-Modified'));
+        self::assertSame($expectedCacheControl, $response->getHeaderLine('Cache-Control'));
+        self::assertSame($expectedPragma, $response->getHeaderLine('Pragma'));
+    }
+
+    public function provideCacheLimiterValues(): array
     {
         $cacheExpire  = 60;
         $maxAge       = (string) (60 * $cacheExpire);
         $lastModified = $this->getExpectedLastModified();
 
         return [
-            'empty' => [
-                'cache_expire' => $cacheExpire,
-                'cache_limiter' => '',
-                'expected_expires' => '',
+            'empty'     => [
+                'cache_expire'           => $cacheExpire,
+                'cache_limiter'          => '',
+                'expected_expires'       => '',
                 'expected_last_modified' => '',
                 'expected_cache_control' => '',
-                'expected_pragma' => '',
+                'expected_pragma'        => '',
             ],
             'not-valid' => [
-                'cache_expire' => $cacheExpire,
-                'cache_limiter' => 'not-valid',
-                'expected_expires' => '',
+                'cache_expire'           => $cacheExpire,
+                'cache_limiter'          => 'not-valid',
+                'expected_expires'       => '',
                 'expected_last_modified' => '',
                 'expected_cache_control' => '',
-                'expected_pragma' => '',
+                'expected_pragma'        => '',
             ],
-            'nocache' => [
-                'cache_expire' => $cacheExpire,
-                'cache_limiter' => 'nocache',
-                'expected_expires' => Http::CACHE_PAST_DATE,
+            'nocache'   => [
+                'cache_expire'           => $cacheExpire,
+                'cache_limiter'          => 'nocache',
+                'expected_expires'       => Http::CACHE_PAST_DATE,
                 'expected_last_modified' => '',
                 'expected_cache_control' => 'no-store, no-cache, must-revalidate',
-                'expected_pragma' => 'no-cache',
+                'expected_pragma'        => 'no-cache',
             ],
-            'public' => [
-                'cache_expire' => $cacheExpire,
-                'cache_limiter' => 'public',
-                'expected_expires' => Http::CACHE_PAST_DATE,
-                'expected_last_modified' => '',
+            'public'    => [
+                'cache_expire'           => $cacheExpire,
+                'cache_limiter'          => 'public',
+                'expected_expires'       => gmdate(Http::DATE_FORMAT, time() + (60 * $cacheExpire)),
+                'expected_last_modified' => $lastModified,
                 'expected_cache_control' => 'public, max-age=' . $maxAge,
-                'expected_pragma' => '',
+                'expected_pragma'        => '',
             ],
-            'private' => [
-                'cache_expire' => $cacheExpire,
-                'cache_limiter' => 'private',
-                'expected_expires' => Http::CACHE_PAST_DATE,
-                'expected_last_modified' => '',
+            'private'   => [
+                'cache_expire'           => $cacheExpire,
+                'cache_limiter'          => 'private',
+                'expected_expires'       => Http::CACHE_PAST_DATE,
+                'expected_last_modified' => $lastModified,
                 'expected_cache_control' => 'private, max-age=' . $maxAge,
-                'expected_pragma' => '',
+                'expected_pragma'        => '',
             ],
         ];
     }
@@ -314,9 +323,9 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     {
         $lastmod = getlastmod();
         if ($lastmod === false) {
-            $rc = new ReflectionClass(CacheHeadersGeneratorTrait::class);
+            $rc        = new ReflectionClass(CacheHeadersGeneratorTrait::class);
             $classFile = $rc->getFileName();
-            $lastmod = filemtime($classFile);
+            $lastmod   = filemtime($classFile);
         }
 
         return $lastmod ? gmdate(Http::DATE_FORMAT, $lastmod) : false;

@@ -16,6 +16,11 @@ use Mezzio\Session\SessionIdentifierAwareInterface;
 use Mezzio\Session\SessionInterface;
 use PHPUnit\Framework\TestCase;
 
+use function json_decode;
+use function json_encode;
+
+use const JSON_PRESERVE_ZERO_FRACTION;
+
 class SessionTest extends TestCase
 {
     public function testImplementsSessionInterface(): void
@@ -38,7 +43,7 @@ class SessionTest extends TestCase
 
     public function testRegenerateProducesANewInstance(): Session
     {
-        $session = new Session([]);
+        $session     = new Session([]);
         $regenerated = $session->regenerate();
         $this->assertNotSame($session, $regenerated);
         return $regenerated;
@@ -101,7 +106,7 @@ class SessionTest extends TestCase
             'foo' => 'bar',
             'baz' => 'bat',
         ];
-        $session = new Session($original);
+        $session  = new Session($original);
         $this->assertSame($original, $session->toArray());
 
         $session->clear();
@@ -111,15 +116,15 @@ class SessionTest extends TestCase
 
     public function serializedDataProvider(): iterable
     {
-        $data = (object) ['test_case' => $this];
-        $expected = json_decode(json_encode($data, \JSON_PRESERVE_ZERO_FRACTION), true);
+        $data     = (object) ['test_case' => $this];
+        $expected = json_decode(json_encode($data, JSON_PRESERVE_ZERO_FRACTION), true);
         yield 'nested-objects' => [$data, $expected];
     }
 
     /**
      * @dataProvider serializedDataProvider
      */
-    public function testSetEnsuresDataIsJsonSerializable($data, $expected): void
+    public function testSetEnsuresDataIsJsonSerializable(object $data, array $expected): void
     {
         $session = new Session([]);
         $session->set('foo', $data);

@@ -19,9 +19,7 @@ class SessionMiddleware implements MiddlewareInterface
 {
     public const SESSION_ATTRIBUTE = 'session';
 
-    /**
-     * @var SessionPersistenceInterface
-     */
+    /** @var SessionPersistenceInterface */
     private $persistence;
 
     public function __construct(SessionPersistenceInterface $persistence)
@@ -29,9 +27,9 @@ class SessionMiddleware implements MiddlewareInterface
         $this->persistence = $persistence;
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler) : ResponseInterface
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $session = new LazySession($this->persistence, $request);
+        $session  = new LazySession($this->persistence, $request);
         $response = $handler->handle(
             $request
                 ->withAttribute(self::SESSION_ATTRIBUTE, $session)

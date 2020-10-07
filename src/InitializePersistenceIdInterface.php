@@ -14,9 +14,6 @@ interface InitializePersistenceIdInterface
 {
     /**
      * Returns new instance with id generated / regenerated, if required
-     *
-     * @param SessionInterface $session
-     * @return SessionInterface
      */
-    public function initializeId(SessionInterface $session) : SessionInterface;
+    public function initializeId(SessionInterface $session): SessionInterface;
 }
