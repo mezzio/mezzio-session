@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Added
 
+- [#5](https://github.com/mezzio/mezzio-session/pull/5) adds the ability to use pull the session instance using the request attribute `Mezzio\Session\SessionInterface::class` (in addition to `Mezzio\Sesson\SessionMiddleware::SESSION_ATTRIBUTE` or `session`). This makes usage more consistent with other Mezzio packages, where interface or class names are used for request attributes. The original values will be kept, as they allow substituting other session implementations.
+
 - [#10](https://github.com/mezzio/mezzio-session/pull/10) adds a new property and method to the `Mezzion\Session\Persistence\SessionCookieAwareTrait`, `private $deleteCookieOnEmptySession = false`, and `public function isDeleteCookieOnEmptySession(): bool`; implementations that want to enforce deleting the session cookie when the session is empty can toggle the property flag to make this behavior occur.
 
 - [zendframework/zend-expressive-session#38](https://github.com/zendframework/zend-expressive-session/pull/38) adds `InitializeSessionIdInterface` and `InitializePersistenceIdInterface`. These add `initializeId()` methods to session and persistence, allowing developers to access new or regenerated session IDs before the session is persisted.
