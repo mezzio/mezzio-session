@@ -27,7 +27,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use function class_exists;
 use function method_exists;
 use function sprintf;
-use function strpos;
 use function urlencode;
 
 class SessionCookieAwareTraitTest extends TestCase
@@ -346,7 +345,7 @@ class SessionCookieAwareTraitTest extends TestCase
         $cookieName  = 'SESSIONCOOKIENAME';
         $cookieValue = 'session-cookie-value';
 
-        $consumer = $this->createConsumerInstance('SESSIONCOOKIENAME', null, null, null, null, null, null, true);
+        $consumer = $this->createConsumerInstance($cookieName, null, null, null, null, null, null, true);
         $session  = new Session(['foo' => 'bar']);
         $session->clear();
         $response = $consumer->addSessionCookieHeaderToResponse(new Response(), $cookieValue, $session);
@@ -354,6 +353,6 @@ class SessionCookieAwareTraitTest extends TestCase
         $cookieString = $response->getHeaderLine('Set-Cookie');
         $this->assertIsString($cookieString);
         $expiresString = 'Expires=Thu, 01 Jan 1970 00:00:01 GMT';
-        $this->assertNotFalse(strpos($cookieString, $expiresString), 'cookie should bet set to expire in the past');
+        $this->assertStringContainsString($expiresString, $cookieString, 'cookie should bet set to expire in the past');
     }
 }
