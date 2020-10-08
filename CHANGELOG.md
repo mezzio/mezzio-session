@@ -2,16 +2,35 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 1.4.1 - 2020-10-08
+## 1.5.0 - TBD
 
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
+## 1.4.1 - 2020-10-08
 
 -----
 
 ### Release Notes for [1.4.1](https://github.com/mezzio/mezzio-session/milestone/2)
 
 1.4.x bugfix release (patch)
-
-### 1.4.1
 
 - Total issues resolved: **0**
 - Total pull requests resolved: **1**
