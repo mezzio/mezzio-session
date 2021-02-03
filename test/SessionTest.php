@@ -15,6 +15,7 @@ use Mezzio\Session\SessionCookiePersistenceInterface;
 use Mezzio\Session\SessionIdentifierAwareInterface;
 use Mezzio\Session\SessionInterface;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 use function json_decode;
 use function json_encode;
@@ -117,7 +118,7 @@ class SessionTest extends TestCase
     /**
      * @psalm-return array<
      *     string,
-     *     array{\stdClass, array<array-key, mixed>}
+     *     array{stdClass, array<array-key, mixed>}
      * >
      */
     public function serializedDataProvider(): array
