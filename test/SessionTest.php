@@ -117,7 +117,7 @@ class SessionTest extends TestCase
     /**
      * @psalm-return array<
      *     string,
-     *     array{\stdClass, array<array-key, mixed>}
+     *     array{stdClass, array<array-key, mixed>}
      * >
      */
     public function serializedDataProvider(): array
