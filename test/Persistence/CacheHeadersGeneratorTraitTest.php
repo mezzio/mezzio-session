@@ -280,7 +280,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
 
         $expectedDate = DateTimeImmutable::createFromFormat(Http::DATE_FORMAT, $expect);
         assert($expectedDate instanceof DateTimeImmutable);
-        $actualDate   = DateTimeImmutable::createFromFormat(Http::DATE_FORMAT, $actual);
+        $actualDate = DateTimeImmutable::createFromFormat(Http::DATE_FORMAT, $actual);
         assert($actualDate instanceof DateTimeImmutable);
 
         self::assertEqualsWithDelta($expectedDate->getTimestamp(), $actualDate->getTimestamp(), $delta);
