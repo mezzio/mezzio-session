@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace MezzioTest\Session\Persistence;
 
+use DateTimeImmutable;
 use Laminas\Diactoros\Response;
 use Mezzio\Session\Persistence\CacheHeadersGeneratorTrait;
 use Mezzio\Session\Persistence\Http;
@@ -260,10 +261,24 @@ class CacheHeadersGeneratorTraitTest extends TestCase
 
         $response = $consumer->addCacheHeadersToResponse(new Response());
 
-        self::assertSame($expectedExpires, $response->getHeaderLine('Expires'));
+        self::assertEqualDateWithDelta($expectedExpires, $response->getHeaderLine('Expires'), 2);
         self::assertSame($expectedLastModified, $response->getHeaderLine('Last-Modified'));
         self::assertSame($expectedCacheControl, $response->getHeaderLine('Cache-Control'));
         self::assertSame($expectedPragma, $response->getHeaderLine('Pragma'));
+    }
+
+    private static function assertEqualDateWithDelta(string $expect, string $actual, int $delta = 2): void
+    {
+        if ($expect === '') {
+            self::assertEquals($expect, $actual);
+
+            return;
+        }
+
+        $expectedDate = DateTimeImmutable::createFromFormat(Http::DATE_FORMAT, $expect);
+        $actualDate   = DateTimeImmutable::createFromFormat(Http::DATE_FORMAT, $actual);
+
+        self::assertEqualsWithDelta($expectedDate->getTimestamp(), $actualDate->getTimestamp(), $delta);
     }
 
     public function provideCacheLimiterValues(): array
