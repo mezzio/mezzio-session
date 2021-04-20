@@ -18,6 +18,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use ReflectionClass;
 
+use function assert;
 use function filemtime;
 use function getlastmod;
 use function gmdate;
@@ -261,7 +262,9 @@ class CacheHeadersGeneratorTraitTest extends TestCase
 
         $response = $consumer->addCacheHeadersToResponse(new Response());
 
-        self::assertEqualDateWithDelta($expectedExpires, $response->getHeaderLine('Expires'), 2);
+        $actualExpires = $response->getHeaderLine('Expires');
+        self::assertIsString($actualExpires);
+        self::assertEqualDateWithDelta($expectedExpires, $actualExpires, 2);
         self::assertSame($expectedLastModified, $response->getHeaderLine('Last-Modified'));
         self::assertSame($expectedCacheControl, $response->getHeaderLine('Cache-Control'));
         self::assertSame($expectedPragma, $response->getHeaderLine('Pragma'));
@@ -276,7 +279,9 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         }
 
         $expectedDate = DateTimeImmutable::createFromFormat(Http::DATE_FORMAT, $expect);
+        assert($expectedDate instanceof DateTimeImmutable);
         $actualDate   = DateTimeImmutable::createFromFormat(Http::DATE_FORMAT, $actual);
+        assert($actualDate instanceof DateTimeImmutable);
 
         self::assertEqualsWithDelta($expectedDate->getTimestamp(), $actualDate->getTimestamp(), $delta);
     }
