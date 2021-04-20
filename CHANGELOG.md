@@ -2,27 +2,24 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 1.4.2 - TBD
+## 1.4.2 - 2021-04-20
 
-### Added
 
-- Nothing.
+-----
 
-### Changed
+### Release Notes for [1.4.2](https://github.com/mezzio/mezzio-session/milestone/5)
 
-- Nothing.
+1.4.x bugfix release (patch)
 
-### Deprecated
+### 1.4.2
 
-- Nothing.
+- Total issues resolved: **0**
+- Total pull requests resolved: **1**
+- Total contributors: **1**
 
-### Removed
+#### Enhancement
 
-- Nothing.
-
-### Fixed
-
-- Nothing.
+ - [21: Setup GitHub Actions workflow](https://github.com/mezzio/mezzio-session/pull/21) thanks to @gsteel
 
 ## 1.4.1 - 2020-10-08
 
