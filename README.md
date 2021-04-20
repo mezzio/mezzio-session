@@ -1,7 +1,6 @@
 # mezzio-session
 
-[![Build Status](https://travis-ci.com/mezzio/mezzio-session.svg?branch=master)](https://travis-ci.com/mezzio/mezzio-session)
-[![Coverage Status](https://coveralls.io/repos/github/mezzio/mezzio-session/badge.svg?branch=master)](https://coveralls.io/github/mezzio/mezzio-session?branch=master)
+[![Build Status](https://github.com/mezzio/mezzio-session/workflows/Continuous%20Integration/badge.svg)](https://github.com/mezzio/mezzio-session/actions?query=workflow%3A"Continuous+Integration")
 
 This library provides session handling middleware for PSR-7 applications, using
 an adapter-based approach that will allow usage of ext-session, JWT, or other
