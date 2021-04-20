@@ -42,19 +42,19 @@ $ composer require mezzio/mezzio-session-ext
 mezzio-session provides the following:
 
 - Interfaces for:
-    - session containers
-    - session persistence
+  - session containers
+  - session persistence
 - An implementation of the session container.
 - A "lazy-loading" implementation of the session container, to allow delaying
   any de/serialization and/or I/O processes until session data is requested;
   this implementation decorates a normal session container.
 - PSR-7 middleware that:
-    - composes a session persistence implementation.
-    - initializes the lazy-loading session container, using the session
-      persistence implementation.
-    - delegates to the next middleware, passing the session container into the
-      request.
-    - finalizes the session before returning the response.
+  - composes a session persistence implementation.
+  - initializes the lazy-loading session container, using the session
+    persistence implementation.
+  - delegates to the next middleware, passing the session container into the
+    request.
+  - finalizes the session before returning the response.
 
 Persistence implementations locate session information from the requests (e.g.,
 via a cookie) in order to initialize the session. On completion of the request,
@@ -66,8 +66,8 @@ Note that the goals of this package are solely focused on _session persistence_
 and _access to session data by middleware_. If you also need other features
 often related to session data, you may want to consider the following packages:
 
-- [mezzio-flash](https://github.com/mezzio/mezzio-flash): 
+- [mezzio-flash](https://github.com/mezzio/mezzio-flash):
   provides flash message capabilities.
-- [mezzio-csrf](https://github.com/mezzio/mezzio-csrf): 
+- [mezzio-csrf](https://github.com/mezzio/mezzio-csrf):
   provides CSRF token generation, storage, and verification, using either a
   session container, or flash messages.
