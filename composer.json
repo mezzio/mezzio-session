@@ -35,9 +35,9 @@
     "require-dev": {
         "laminas/laminas-coding-standard": "~2.2.0",
         "laminas/laminas-diactoros": "^2.2",
-        "phpunit/phpunit": "^9.3",
-        "psalm/plugin-phpunit": "^0.12.2",
-        "vimeo/psalm": "^3.16"
+        "phpunit/phpunit": "^9.5",
+        "psalm/plugin-phpunit": "^0.16.1",
+        "vimeo/psalm": "^4.10"
     },
     "suggest": {
         "mezzio/mezzio-csrf": "^1.0 || ^1.0-dev for CSRF protection capabilities",
