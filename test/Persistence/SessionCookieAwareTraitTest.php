@@ -202,7 +202,7 @@ class SessionCookieAwareTraitTest extends TestCase
         $consumer  = $this->createConsumerInstance($cookieName);
         $setCookie = $consumer->createSessionCookieForResponse(
             $cookieValue ?? '',
-            $cookieLifetime ?? 0
+            $cookieLifetime
         );
 
         $actualHeaderLine = (string) $setCookie;

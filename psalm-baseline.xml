@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="3.16@d03e5ef057d6adc656c0ff7e166c50b73b4f48f3">
+<files psalm-version="4.10.0@916b098b008f6de4543892b1e0651c1c3b92cbfa">
   <file src="src/LazySession.php">
     <MixedInferredReturnType occurrences="1">
       <code>string</code>
@@ -136,8 +136,5 @@
     <PossiblyInvalidCast occurrences="1">
       <code>$setCookie</code>
     </PossiblyInvalidCast>
-    <TypeDoesNotContainType occurrences="1">
-      <code>$cookieLifetime</code>
-    </TypeDoesNotContainType>
   </file>
 </files>
