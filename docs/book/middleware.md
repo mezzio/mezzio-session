@@ -86,3 +86,37 @@ $app->post('/login', [
     \User\Middleware\LoginHandler::class
 ]);
 ```
+
+## Retrieving the session in your own middleware
+
+Whilst it is trivial to retrieve the initialised session from the request with `$session = $request->getAttribute(SessionInterface::class);`, static analysers cannot automatically infer the value assigned to `$session`.
+
+To provide a convenient and type safe way to retrieve the session from the current request without manually asserting its type, `SessionRetrieval::fromRequest($request)` can be called so that you can use the request without further assertions.
+
+Furthermore, a static method exists to optionally retrieve a session when you cannot be sure the middleware has previously been piped: `SessionRetrieval::fromRequestOrNull($request)`
+
+```php
+
+use Mezzio\Session\Exception\SessionNotInitializedException;
+use Mezzio\Session\SessionRetrieval;
+use Psr\Http\Message\ServerRequestInterface;
+
+assert($request instanceof ServerRequestInterface);
+
+// Typical usage where execution should halt when the session has not been initialized:
+
+$session = SessionRetrieval::fromRequest($request);
+
+// Catching the exception in order to handle the exception
+
+try {
+    $session = SessionRetrieval::fromRequest($request);
+} catch (SessionNotInitializedException $error) {
+    // ... Handle missing session
+}
+
+// Optional retrieval without an exception
+
+$session = SessionRetrieval::fromRequestOrNull($request);
+
+```
