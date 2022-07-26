@@ -99,7 +99,7 @@ Furthermore, a static method exists to optionally retrieve a session when you ca
 namespace My\NameSpace;
 
 use Mezzio\Session\Exception\SessionNotInitializedException;
-use Mezzio\Session\SessionRetrieval;
+use Mezzio\Session\RetrieveSession;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -111,7 +111,7 @@ class MyRequestHandler implements RequestHandlerInterface {
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
         try {
-            $session = SessionRetrieval::fromRequest($request);
+            $session = RetrieveSession::fromRequest($request);
         } catch (SessionNotInitializedException $error) {
             // Handle the uninitialized session:
             return $this->redirectToLogin();
@@ -128,7 +128,7 @@ class AnotherRequestHandler implements RequestHandlerInterface {
     
     public function handle(ServerRequestInterface $request) : ResponseInterface
     {
-        $session = SessionRetrieval::fromRequestOrNull($request);
+        $session = RetrieveSession::fromRequestOrNull($request);
         if (! $session) {
             // Handle the uninitialized session:
             return $this->redirectToLogin();

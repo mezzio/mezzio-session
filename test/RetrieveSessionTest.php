@@ -6,22 +6,23 @@ namespace MezzioTest\Session;
 
 use Laminas\Diactoros\ServerRequest;
 use Mezzio\Session\Exception\SessionNotInitializedException;
+use Mezzio\Session\RetrieveSession;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionMiddleware;
-use Mezzio\Session\SessionRetrieval;
 use PHPUnit\Framework\TestCase;
 
-final class SessionRetrievalTest extends TestCase
+/** @covers \Mezzio\Session\RetrieveSession */
+final class RetrieveSessionTest extends TestCase
 {
     public function testAnExceptionIsThrownRetrievingTheSessionWhenItCannotBeFoundInAnyRequestAttribute(): void
     {
         $this->expectException(SessionNotInitializedException::class);
-        SessionRetrieval::fromRequest(new ServerRequest());
+        RetrieveSession::fromRequest(new ServerRequest());
     }
 
     public function testThatTheSessionWillBeNullIfItCannotBeFoundInTheRequestAttributes(): void
     {
-        self::assertNull(SessionRetrieval::fromRequestOrNull(new ServerRequest()));
+        self::assertNull(RetrieveSession::fromRequestOrNull(new ServerRequest()));
     }
 
     /** @return array<string, array{0: string}> */
@@ -39,7 +40,7 @@ final class SessionRetrievalTest extends TestCase
         $session = $this->createMock(SessionInterface::class);
         $request = (new ServerRequest())->withAttribute($attributeName, $session);
 
-        self::assertSame($session, SessionRetrieval::fromRequest($request));
-        self::assertSame($session, SessionRetrieval::fromRequestOrNull($request));
+        self::assertSame($session, RetrieveSession::fromRequest($request));
+        self::assertSame($session, RetrieveSession::fromRequestOrNull($request));
     }
 }
