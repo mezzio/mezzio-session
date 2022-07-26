@@ -96,27 +96,47 @@ To provide a convenient and type safe way to retrieve the session from the curre
 Furthermore, a static method exists to optionally retrieve a session when you cannot be sure the middleware has previously been piped: `SessionRetrieval::fromRequestOrNull($request)`
 
 ```php
+namespace My\NameSpace;
 
 use Mezzio\Session\Exception\SessionNotInitializedException;
 use Mezzio\Session\SessionRetrieval;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-assert($request instanceof ServerRequestInterface);
-
-// Typical usage where execution should halt when the session has not been initialized:
-
-$session = SessionRetrieval::fromRequest($request);
-
-// Catching the exception in order to handle the exception
-
-try {
-    $session = SessionRetrieval::fromRequest($request);
-} catch (SessionNotInitializedException $error) {
-    // ... Handle missing session
+class MyRequestHandler implements RequestHandlerInterface {
+    
+    // ...
+    
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        try {
+            $session = SessionRetrieval::fromRequest($request);
+        } catch (SessionNotInitializedException $error) {
+            // Handle the uninitialized session:
+            return $this->redirectToLogin();
+        }
+        
+        $value = $session->get('SomeKey');
+        $this->templateRenderer->render('some:template', ['value' => $value]);
+    }
 }
 
-// Optional retrieval without an exception
-
-$session = SessionRetrieval::fromRequestOrNull($request);
+class AnotherRequestHandler implements RequestHandlerInterface {
+    
+    // ...
+    
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        $session = SessionRetrieval::fromRequestOrNull($request);
+        if (! $session) {
+            // Handle the uninitialized session:
+            return $this->redirectToLogin();
+        }
+        
+        $value = $session->get('SomeKey');
+        $this->templateRenderer->render('some:template', ['value' => $value]);
+    }
+}
 
 ```
