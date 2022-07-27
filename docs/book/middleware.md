@@ -86,3 +86,57 @@ $app->post('/login', [
     \User\Middleware\LoginHandler::class
 ]);
 ```
+
+## Retrieving the session in your own middleware
+
+Whilst it is trivial to retrieve the initialised session from the request with `$session = $request->getAttribute(SessionInterface::class);`, static analysers cannot automatically infer the value assigned to `$session`.
+
+To provide a convenient and type safe way to retrieve the session from the current request without manually asserting its type, `SessionRetrieval::fromRequest($request)` can be called so that you can use the request without further assertions.
+
+Furthermore, a static method exists to optionally retrieve a session when you cannot be sure the middleware has previously been piped: `SessionRetrieval::fromRequestOrNull($request)`
+
+```php
+namespace My\NameSpace;
+
+use Mezzio\Session\Exception\SessionNotInitializedException;
+use Mezzio\Session\RetrieveSession;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
+class MyRequestHandler implements RequestHandlerInterface {
+    
+    // ...
+    
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        try {
+            $session = RetrieveSession::fromRequest($request);
+        } catch (SessionNotInitializedException $error) {
+            // Handle the uninitialized session:
+            return $this->redirectToLogin();
+        }
+        
+        $value = $session->get('SomeKey');
+        $this->templateRenderer->render('some:template', ['value' => $value]);
+    }
+}
+
+class AnotherRequestHandler implements RequestHandlerInterface {
+    
+    // ...
+    
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        $session = RetrieveSession::fromRequestOrNull($request);
+        if (! $session) {
+            // Handle the uninitialized session:
+            return $this->redirectToLogin();
+        }
+        
+        $value = $session->get('SomeKey');
+        $this->templateRenderer->render('some:template', ['value' => $value]);
+    }
+}
+
+```
