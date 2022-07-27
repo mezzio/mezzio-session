@@ -9,6 +9,9 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigProviderTest extends TestCase
 {
+    /** @var ConfigProvider */
+    private $provider;
+
     public function setUp(): void
     {
         $this->provider = new ConfigProvider();
@@ -17,6 +20,7 @@ class ConfigProviderTest extends TestCase
     public function testInvocationReturnsArray(): array
     {
         $config = ($this->provider)();
+        /** @psalm-suppress RedundantCondition */
         $this->assertIsArray($config);
         return $config;
     }

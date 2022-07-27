@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace MezzioTest\Session\Persistence;
 
 use DateTimeImmutable;
+use Generator;
 use Laminas\Diactoros\Response;
 use Mezzio\Session\Persistence\CacheHeadersGeneratorTrait;
 use Mezzio\Session\Persistence\Http;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
 use ReflectionClass;
 
 use function assert;
@@ -38,37 +38,8 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         int $cacheExpire = 180,
         string $cacheLimiter = '',
         ?string $lastModified = null
-    ): object {
-        return new class ($cacheExpire, $cacheLimiter, $lastModified) {
-            use CacheHeadersGeneratorTrait {
-                addCacheHeadersToResponse as trait_addCacheHeadersToResponse;
-                responseAlreadyHasCacheHeaders as trait_responseAlreadyHasCacheHeaders;
-                getLastModified as trait_getLastModified;
-            }
-
-            public function __construct(int $cacheExpire, string $cacheLimiter, ?string $lastModified = null)
-            {
-                $this->cacheExpire  = $cacheExpire;
-                $this->cacheLimiter = $cacheLimiter;
-                $this->lastModified = $lastModified;
-            }
-
-            public function addCacheHeadersToResponse(ResponseInterface $response): ResponseInterface
-            {
-                return $this->trait_addCacheHeadersToResponse($response);
-            }
-
-            /** @return string|false */
-            public function getLastModified()
-            {
-                return $this->trait_getLastModified();
-            }
-
-            public function responseAlreadyHasCacheHeaders(ResponseInterface $response): bool
-            {
-                return $this->trait_responseAlreadyHasCacheHeaders($response);
-            }
-        };
+    ): CacheHeadersGeneratorConsumer {
+        return new CacheHeadersGeneratorConsumer($cacheExpire, $cacheLimiter, $lastModified);
     }
 
     public function testLastModified(): void
@@ -101,6 +72,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         self::assertFalse($consumer->responseAlreadyHasCacheHeaders($response));
     }
 
+    /** @return array<string, array{0: string, 1: string, 2: bool}> */
     public function provideCacheHeaderValues(): array
     {
         return [
@@ -112,6 +84,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         ];
     }
 
+    /** @return array<string, array{0: string}> */
     public function provideUnsupportedCacheLimiters(): array
     {
         return [
@@ -134,7 +107,8 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         self::assertFalse($response->hasHeader('Pragma'));
     }
 
-    public function providePreexistingCacheHeaders(): iterable
+    /** @return Generator<string, array{0: string, 1: string, 2: list<string>}> */
+    public function providePreexistingCacheHeaders(): Generator
     {
         yield 'last-modified' => [
             'Last-Modified',
@@ -257,7 +231,6 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         $response = $consumer->addCacheHeadersToResponse(new Response());
 
         $actualExpires = $response->getHeaderLine('Expires');
-        self::assertIsString($actualExpires);
         self::assertEqualDateWithDelta($expectedExpires, $actualExpires, 2);
         self::assertSame($expectedLastModified, $response->getHeaderLine('Last-Modified'));
         self::assertSame($expectedCacheControl, $response->getHeaderLine('Cache-Control'));
@@ -280,6 +253,16 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         self::assertEqualsWithDelta($expectedDate->getTimestamp(), $actualDate->getTimestamp(), $delta);
     }
 
+    /**
+     * @return array<string, array{
+     *     cache_expire: int,
+     *     cache_limiter: string,
+     *     expected_expires: string,
+     *     expected_last_modified: string,
+     *     expected_cache_control: string,
+     *     expected_pragma: string,
+     * }>
+     */
     public function provideCacheLimiterValues(): array
     {
         $cacheExpire  = 60;
@@ -315,7 +298,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
                 'cache_expire'           => $cacheExpire,
                 'cache_limiter'          => 'public',
                 'expected_expires'       => gmdate(Http::DATE_FORMAT, time() + (60 * $cacheExpire)),
-                'expected_last_modified' => $lastModified,
+                'expected_last_modified' => (string) $lastModified,
                 'expected_cache_control' => 'public, max-age=' . $maxAge,
                 'expected_pragma'        => '',
             ],
@@ -323,7 +306,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
                 'cache_expire'           => $cacheExpire,
                 'cache_limiter'          => 'private',
                 'expected_expires'       => Http::CACHE_PAST_DATE,
-                'expected_last_modified' => $lastModified,
+                'expected_last_modified' => (string) $lastModified,
                 'expected_cache_control' => 'private, max-age=' . $maxAge,
                 'expected_pragma'        => '',
             ],

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Mezzio\Session;
 
-use stdClass;
-
 use function array_key_exists;
+use function is_numeric;
 use function json_decode;
 use function json_encode;
 
@@ -20,7 +19,7 @@ class Session implements
     /**
      * Current data within the session.
      *
-     * @var array
+     * @var array<string, mixed>
      */
     private $data;
 
@@ -54,13 +53,17 @@ class Session implements
      */
     private $sessionLifetime = 0;
 
+    /** @param array<string, mixed> $data */
     public function __construct(array $data, string $id = '')
     {
         $this->data = $this->originalData = $data;
         $this->id   = $id;
 
-        if (isset($data[SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY])) {
-            $this->sessionLifetime = $data[SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY];
+        /** @psalm-suppress MixedAssignment */
+        $lifetime = $data[SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY] ?? null;
+
+        if (is_numeric($lifetime)) {
+            $this->sessionLifetime = (int) $lifetime;
         }
     }
 
@@ -71,7 +74,7 @@ class Session implements
      * within a session are serializable across any session adapter.
      *
      * @param mixed $value
-     * @return null|bool|int|float|string|array|stdClass
+     * @return null|bool|int|float|string|array
      */
     public static function extractSerializableValue($value)
     {
@@ -80,6 +83,8 @@ class Session implements
 
     /**
      * Retrieve all data for purposes of persistence.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {

@@ -34,7 +34,7 @@ trait CacheHeadersGeneratorTrait
      */
     private $cacheLimiter;
 
-    /** @var array */
+    /** @var array<string, bool> */
     private static $supportedCacheLimiters = [
         'nocache'           => true,
         'public'            => true,
@@ -42,7 +42,7 @@ trait CacheHeadersGeneratorTrait
         'private_no_expire' => true,
     ];
 
-    /** @var bool|string */
+    /** @var bool|string|null */
     private $lastModified;
 
     /**

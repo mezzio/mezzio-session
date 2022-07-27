@@ -21,7 +21,7 @@ use function time;
  */
 trait SessionCookieAwareTrait
 {
-    /** @var string */
+    /** @var string|null */
     private $cookieName;
 
     /** @var int */

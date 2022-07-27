@@ -7,15 +7,11 @@ namespace MezzioTest\Session\Persistence;
 use Dflydev\FigCookies\Cookie;
 use Dflydev\FigCookies\FigRequestCookies;
 use Dflydev\FigCookies\Modifier\SameSite;
-use Dflydev\FigCookies\SetCookie;
 use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\ServerRequestFactory;
-use Mezzio\Session\Persistence\SessionCookieAwareTrait;
 use Mezzio\Session\Session;
-use Mezzio\Session\SessionInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use function class_exists;
@@ -57,8 +53,8 @@ class SessionCookieAwareTraitTest extends TestCase
         ?bool $cookieHttpOnly = null,
         ?string $cookieSameSite = null,
         ?bool $deleteCookieOnEmptySession = null
-    ): object {
-        return new class (
+    ): SessionCookieAwareConsumer {
+        return new SessionCookieAwareConsumer(
             $cookieName ?? self::COOKIE_NAME,
             $cookieLifetime ?? self::COOKIE_LIFETIME,
             $cookiePath ?? self::COOKIE_PATH,
@@ -67,69 +63,13 @@ class SessionCookieAwareTraitTest extends TestCase
             $cookieHttpOnly ?? self::COOKIE_HTTPONLY,
             $cookieSameSite ?? self::COOKIE_SAMESITE,
             $deleteCookieOnEmptySession ?? self::DELETE_COOKIE_ON_EMPTY_SESSION
-        ) {
-            use SessionCookieAwareTrait {
-                getSessionCookieValueFromRequest as trait_getSessionCookieValueFromRequest;
-                addSessionCookieHeaderToResponse as trait_addSessionCookieHeaderToResponse;
-                createSessionCookieForResponse as trait_createSessionCookieForResponse;
-                getSessionCookieLifetime as trait_getSessionCookieLifetime;
-                isDeleteCookieOnEmptySession as trait_isDeleteCookieOnEmptySession;
-            }
-
-            public function __construct(
-                string $cookieName,
-                int $cookieLifetime = 0,
-                string $cookiePath = '/',
-                ?string $cookieDomain = null,
-                bool $cookieSecure = false,
-                bool $cookieHttpOnly = false,
-                string $cookieSameSite = '',
-                bool $deleteCookieOnEmptySession = false
-            ) {
-                $this->cookieName                 = $cookieName;
-                $this->cookieLifetime             = $cookieLifetime;
-                $this->cookiePath                 = $cookiePath;
-                $this->cookieDomain               = $cookieDomain;
-                $this->cookieSecure               = $cookieSecure;
-                $this->cookieHttpOnly             = $cookieHttpOnly;
-                $this->cookieSameSite             = $cookieSameSite;
-                $this->deleteCookieOnEmptySession = $deleteCookieOnEmptySession;
-            }
-
-            public function getSessionCookieValueFromRequest(ServerRequestInterface $request): string
-            {
-                return $this->trait_getSessionCookieValueFromRequest($request);
-            }
-
-            public function addSessionCookieHeaderToResponse(
-                ResponseInterface $response,
-                string $cookieValue,
-                SessionInterface $session
-            ): ResponseInterface {
-                return $this->trait_addSessionCookieHeaderToResponse($response, $cookieValue, $session);
-            }
-
-            public function createSessionCookieForResponse(string $cookieValue, int $cookieLifetime = 0): SetCookie
-            {
-                return $this->trait_createSessionCookieForResponse($cookieValue, $cookieLifetime);
-            }
-
-            public function getSessionCookieLifetime(SessionInterface $session): int
-            {
-                return $this->trait_getSessionCookieLifetime($session);
-            }
-
-            public function isDeleteCookieOnEmptySession(): bool
-            {
-                return $this->trait_isDeleteCookieOnEmptySession();
-            }
-        };
+        );
     }
 
     /**
      * @dataProvider provideRequestSessionCookieValues
      */
-    public function testGetSessionCookieValueFromRequestUsingInjectesCookieParams(
+    public function testGetSessionCookieValueFromRequestUsingInjectsCookieParams(
         string $cookieName,
         ?string $cookieValue = null,
         ?string $expected = null
@@ -147,17 +87,19 @@ class SessionCookieAwareTraitTest extends TestCase
      */
     public function testGetSessionCookieValueFromRequestUsingInjectedCookieHeader(
         string $cookieName,
-        ?string $cookieValue = null,
-        ?string $expected = null
+        ?string $cookieValue,
+        string $expected
     ): void {
         $consumer = $this->createConsumerInstance($cookieName);
 
         $cookie  = Cookie::create($cookieName, $cookieValue);
         $request = FigRequestCookies::set(new ServerRequest(), $cookie);
+        self::assertInstanceOf(ServerRequestInterface::class, $request);
 
         self::assertSame($expected, $consumer->getSessionCookieValueFromRequest($request));
     }
 
+    /** @return array<array-key, array{0: string, 1: string|null, 2: string}> */
     public function provideRequestSessionCookieValues(): array
     {
         $cookieName       = 'SESSIONID';
@@ -210,6 +152,7 @@ class SessionCookieAwareTraitTest extends TestCase
         self::assertSame($expectedHeaderLine, $actualHeaderLine);
     }
 
+    /** @return array<array-key, array{0: string, 1: string|null, 2: int, 3: string}> */
     public function provideResponseCookieHeaderLines(): array
     {
         $cookieName       = 'PHPSESSID';
@@ -302,9 +245,9 @@ class SessionCookieAwareTraitTest extends TestCase
      * @dataProvider provideSessionCookieLifetimeValues
      */
     public function testGetSessionCookieLifetimeReturnsExpectedResults(
-        ?int $cookieLifetime = null,
-        ?int $sessionLifetime = null,
-        ?int $expected = null
+        ?int $cookieLifetime,
+        ?int $sessionLifetime,
+        int $expected
     ): void {
         $consumer = $this->createConsumerInstance('SESSIONCOOKIENAME', $cookieLifetime ?? 0);
         $session  = new Session([]);
@@ -315,6 +258,7 @@ class SessionCookieAwareTraitTest extends TestCase
         self::assertSame($expected, $consumer->getSessionCookieLifetime($session));
     }
 
+    /** @return array<string, array{0: int|null, 1: int|null, 2: int}> */
     public function provideSessionCookieLifetimeValues(): array
     {
         return [
@@ -344,8 +288,7 @@ class SessionCookieAwareTraitTest extends TestCase
         $session->clear();
         $response = $consumer->addSessionCookieHeaderToResponse(new Response(), $cookieValue, $session);
 
-        $cookieString = $response->getHeaderLine('Set-Cookie');
-        $this->assertIsString($cookieString);
+        $cookieString  = $response->getHeaderLine('Set-Cookie');
         $expiresString = 'Expires=Thu, 01 Jan 1970 00:00:01 GMT';
         $this->assertStringContainsString($expiresString, $cookieString, 'cookie should bet set to expire in the past');
     }
