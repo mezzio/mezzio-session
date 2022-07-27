@@ -48,7 +48,7 @@ final class LazySession implements
 
     public function isRegenerated(): bool
     {
-        if (! $this->proxiedSession) {
+        if (! $this->proxiedSession instanceof SessionInterface) {
             return false;
         }
 
@@ -94,7 +94,7 @@ final class LazySession implements
 
     public function hasChanged(): bool
     {
-        if (! $this->proxiedSession) {
+        if (! $this->proxiedSession instanceof SessionInterface) {
             return false;
         }
 
@@ -151,7 +151,8 @@ final class LazySession implements
         }
 
         $this->proxiedSession = $this->persistence->initializeId($this->getProxiedSession());
-        return $this->proxiedSession->getId();
+
+        return $this->getId();
     }
 
     private function getProxiedSession(): SessionInterface

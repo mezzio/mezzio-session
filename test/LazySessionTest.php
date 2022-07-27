@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace MezzioTest\Session\LazySessionTest;
+namespace MezzioTest\Session;
 
 use Mezzio\Session\Exception\NotInitializableException;
 use Mezzio\Session\LazySession;

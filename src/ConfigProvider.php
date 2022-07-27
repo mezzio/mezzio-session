@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Mezzio\Session;
 
-use Zend\Expressive\Session\SessionMiddleware as LegacySessionMiddleware;
-
 class ConfigProvider
 {
     public function __invoke(): array
@@ -19,8 +17,9 @@ class ConfigProvider
     {
         return [
             // Legacy Zend Framework aliases
+            // phpcs:disable WebimpressCodingStandard.Formatting.StringClassReference.Found
             'aliases'   => [
-                LegacySessionMiddleware::class => SessionMiddleware::class,
+                'Zend\Expressive\Session\SessionMiddleware' => SessionMiddleware::class,
             ],
             'factories' => [
                 SessionMiddleware::class => SessionMiddlewareFactory::class,

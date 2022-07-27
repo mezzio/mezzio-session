@@ -13,8 +13,7 @@ class Http
      * HTTP date format to be used in `gmdate` calls for creating valid header
      * values.
      *
-     * òsee https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date
-     *
+     * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date
      * @see https://tools.ietf.org/html/rfc7231#section-7.1.1.2
      */
     public const DATE_FORMAT = 'D, d M Y H:i:s T';
