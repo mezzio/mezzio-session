@@ -19,6 +19,8 @@ interface SessionPersistenceInterface
      *
      * Persists the session data, returning a response instance with any
      * artifacts required to return to the client.
+     *
+     * @param SessionInterface&SessionIdentifierAwareInterface $session
      */
     public function persistSession(SessionInterface $session, ResponseInterface $response): ResponseInterface;
 }
