@@ -16,7 +16,7 @@ final class SessionNotInitializedException extends RuntimeException implements E
         return new self(
             sprintf(
                 'A session has not been initialized. Ensure that you pipe the %s middleware prior to'
-                . 'attempting to retrieve or use a session instance',
+                . ' attempting to retrieve or use a session instance.',
                 SessionMiddleware::class
             )
         );
