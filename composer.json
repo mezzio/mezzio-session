@@ -40,7 +40,7 @@
         "psr/http-server-middleware": "^1.0"
     },
     "require-dev": {
-        "laminas/laminas-coding-standard": "~2.3.0",
+        "laminas/laminas-coding-standard": "~2.4.0",
         "laminas/laminas-diactoros": "^2.2",
         "phpunit/phpunit": "^9.5",
         "psalm/plugin-phpunit": "^0.17.0",
