@@ -35,8 +35,7 @@ class LazySessionTest extends TestCase
      */
     private $request;
 
-    /** @var LazySession */
-    private $session;
+    private LazySession $session;
 
     public function setUp(): void
     {

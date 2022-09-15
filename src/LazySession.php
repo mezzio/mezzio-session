@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Mezzio\Session;
 
 use Mezzio\Session\Exception\NotInitializableException;
+use Mezzio\Session\SessionInterface;
+use Mezzio\Session\SessionPersistenceInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
@@ -21,18 +23,14 @@ final class LazySession implements
     SessionInterface,
     InitializeSessionIdInterface
 {
-    /** @var SessionPersistenceInterface */
-    private $persistence;
+    private SessionPersistenceInterface $persistence;
 
-    /** @var null|SessionInterface */
-    private $proxiedSession;
+    private ?SessionInterface $proxiedSession = null;
 
     /**
      * Request instance to use when calling $persistence->initializeSessionFromRequest()
-     *
-     * @var ServerRequestInterface
      */
-    private $request;
+    private ServerRequestInterface $request;
 
     public function __construct(SessionPersistenceInterface $persistence, ServerRequestInterface $request)
     {
