@@ -21,7 +21,7 @@ class Session implements
      *
      * @var array<string, mixed>
      */
-    private $data;
+    private array $data;
 
     /**
      * The session identifier, if any.
@@ -31,13 +31,10 @@ class Session implements
      * when it is time to persist the session, instead of relying on state in
      * the persistence instance (which may be shared between multiple
      * requests).
-     *
-     * @var string
      */
-    private $id;
+    private string $id;
 
-    /** @var bool */
-    private $isRegenerated = false;
+    private bool $isRegenerated = false;
 
     /**
      * Original data provided to the constructor.
@@ -48,10 +45,8 @@ class Session implements
 
     /**
      * Lifetime of the session cookie.
-     *
-     * @var int
      */
-    private $sessionLifetime = 0;
+    private int $sessionLifetime = 0;
 
     /** @param array<string, mixed> $data */
     public function __construct(array $data, string $id = '')

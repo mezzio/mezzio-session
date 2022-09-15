@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Mezzio\Session;
 
+use Mezzio\Session\SessionPersistenceInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -13,8 +14,7 @@ class SessionMiddleware implements MiddlewareInterface
 {
     public const SESSION_ATTRIBUTE = 'session';
 
-    /** @var SessionPersistenceInterface */
-    private $persistence;
+    private SessionPersistenceInterface $persistence;
 
     public function __construct(SessionPersistenceInterface $persistence)
     {
