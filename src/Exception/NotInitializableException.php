@@ -8,7 +8,6 @@ use Mezzio\Session\InitializePersistenceIdInterface;
 use Mezzio\Session\SessionPersistenceInterface;
 use RuntimeException;
 
-use function get_class;
 use function sprintf;
 
 final class NotInitializableException extends RuntimeException implements ExceptionInterface
@@ -17,7 +16,7 @@ final class NotInitializableException extends RuntimeException implements Except
     {
         return new self(sprintf(
             "Persistence '%s' does not implement '%s'",
-            get_class($persistence),
+            $persistence::class,
             InitializePersistenceIdInterface::class
         ));
     }
