@@ -44,7 +44,7 @@
         "laminas/laminas-diactoros": "^2.21",
         "phpunit/phpunit": "^9.5.26",
         "psalm/plugin-phpunit": "^0.18.3",
-        "vimeo/psalm": "^4.30"
+        "vimeo/psalm": "^5.0"
     },
     "suggest": {
         "mezzio/mezzio-csrf": "^1.0 || ^1.0-dev for CSRF protection capabilities",
