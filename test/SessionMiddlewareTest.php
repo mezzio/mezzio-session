@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace MezzioTest\Session;
 
+use Laminas\Diactoros\Response\TextResponse;
+use Laminas\Diactoros\ServerRequest;
 use Mezzio\Session\LazySession;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Session\SessionPersistenceInterface;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use ReflectionProperty;
 
 class SessionMiddlewareTest extends TestCase
@@ -39,27 +38,9 @@ class SessionMiddlewareTest extends TestCase
 
     public function testMiddlewareCreatesLazySessionAndPassesItToDelegateAndPersistsSessionInResponse(): void
     {
-        /** @psalm-var ServerRequestInterface&MockObject $request */
-        $request = $this->createMock(ServerRequestInterface::class);
-        $request
-            ->expects($this->exactly(2))
-            ->method('withAttribute')
-            ->withConsecutive(
-                [SessionMiddleware::SESSION_ATTRIBUTE, $this->isInstanceOf(LazySession::class)],
-                [SessionInterface::class, $this->isInstanceOf(LazySession::class)],
-            )
-            ->willReturnSelf();
-
-        /** @psalm-var ResponseInterface&MockObject $response */
-        $response = $this->createMock(ResponseInterface::class);
-
-        /** @psalm-var RequestHandlerInterface&MockObject $handler */
-        $handler = $this->createMock(RequestHandlerInterface::class);
-        $handler
-            ->expects($this->once())
-            ->method('handle')
-            ->with($request)
-            ->willReturn($response);
+        $request  = new ServerRequest();
+        $response = new TextResponse('Foo');
+        $handler  = new RequestHandler($response);
 
         /** @psalm-var SessionPersistenceInterface&MockObject $persistence */
         $persistence = $this->createMock(SessionPersistenceInterface::class);
@@ -75,6 +56,18 @@ class SessionMiddlewareTest extends TestCase
             ->willReturn($response);
 
         $middleware = new SessionMiddleware($persistence);
-        $this->assertSame($response, $middleware->process($request, $handler));
+        self::assertSame($response, $middleware->process($request, $handler));
+
+        self::assertTrue($handler->didExecute());
+
+        $received = $handler->received();
+
+        self::assertNotSame($request, $received);
+        self::assertInstanceOf(LazySession::class, $received->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE));
+        self::assertInstanceOf(LazySession::class, $received->getAttribute(SessionInterface::class));
+        self::assertSame(
+            $received->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE),
+            $received->getAttribute(SessionInterface::class),
+        );
     }
 }
