@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<files psalm-version="4.24.0@06dd975cb55d36af80f242561738f16c5f58264f">
+<files psalm-version="5.8.0@9cf4f60a333f779ad3bc704a555920e81d4fdcda">
+  <file src="src/Persistence/CacheHeadersGeneratorTrait.php">
+    <UnusedMethod>
+      <code>generateCacheHeaders</code>
+    </UnusedMethod>
+  </file>
+  <file src="src/RetrieveSession.php">
+    <UnusedConstructor>
+      <code>__construct</code>
+    </UnusedConstructor>
+  </file>
   <file src="src/Session.php">
-    <MixedInferredReturnType occurrences="1"/>
-    <MixedReturnStatement occurrences="1">
+    <MixedInferredReturnType>
+      <code>null|bool|int|float|string|array</code>
+    </MixedInferredReturnType>
+    <MixedReturnStatement>
       <code>json_decode(json_encode($value, JSON_PRESERVE_ZERO_FRACTION), true)</code>
     </MixedReturnStatement>
   </file>
