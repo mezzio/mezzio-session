@@ -76,7 +76,6 @@ class LazySessionTest extends TestCase
         $this->assertSame($this->session, $regeneratedSession);
 
         $r = new ReflectionProperty($regeneratedSession, 'proxiedSession');
-        $r->setAccessible(true);
         $this->assertSame($newSession, $r->getValue($regeneratedSession));
     }
 
@@ -264,7 +263,6 @@ class LazySessionTest extends TestCase
         $actual  = $session->initializeId();
 
         $r = new ReflectionProperty($session, 'proxiedSession');
-        $r->setAccessible(true);
         $this->assertSame($proxy, $r->getValue($session));
         $this->assertSame('generated-id', $actual);
     }

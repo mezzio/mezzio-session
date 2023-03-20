@@ -17,20 +17,14 @@ use ReflectionProperty;
 
 class SessionMiddlewareTest extends TestCase
 {
-    /**
-     * @return mixed
-     */
-    private function getAttribute(object $instance, string $property)
+    private function getAttribute(object $instance, string $property): mixed
     {
         $r = new ReflectionProperty($instance, $property);
-        $r->setAccessible(true);
+
         return $r->getValue($instance);
     }
 
-    /**
-     * @param mixed $expected
-     */
-    private function assertAttributeSame($expected, string $property, object $instance): void
+    private function assertAttributeSame(mixed $expected, string $property, object $instance): void
     {
         $this->assertSame($expected, $this->getAttribute($instance, $property));
     }
