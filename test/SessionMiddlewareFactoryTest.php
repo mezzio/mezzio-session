@@ -28,7 +28,6 @@ class SessionMiddlewareFactoryTest extends TestCase
         $middleware = $factory($container);
 
         $r = new ReflectionProperty($middleware, 'persistence');
-        $r->setAccessible(true);
         $this->assertSame($persistence, $r->getValue($middleware));
     }
 }
