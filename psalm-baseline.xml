@@ -18,4 +18,29 @@
       <code>json_decode(json_encode($value, JSON_PRESERVE_ZERO_FRACTION), true)</code>
     </MixedReturnStatement>
   </file>
+  <file src="test/Persistence/CacheHeadersGeneratorTraitTest.php">
+    <PossiblyUnusedMethod>
+      <code>provideCacheHeaderValues</code>
+      <code>provideCacheLimiterValues</code>
+      <code>providePreexistingCacheHeaders</code>
+      <code>provideUnsupportedCacheLimiters</code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="test/Persistence/SessionCookieAwareTraitTest.php">
+    <PossiblyUnusedMethod>
+      <code>provideRequestSessionCookieValues</code>
+      <code>provideResponseCookieHeaderLines</code>
+      <code>provideSessionCookieLifetimeValues</code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="test/RetrieveSessionTest.php">
+    <PossiblyUnusedMethod>
+      <code>attributeNameProvider</code>
+    </PossiblyUnusedMethod>
+  </file>
+  <file src="test/SessionTest.php">
+    <PossiblyUnusedMethod>
+      <code>serializedDataProvider</code>
+    </PossiblyUnusedMethod>
+  </file>
 </files>

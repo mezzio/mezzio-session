@@ -9,6 +9,7 @@ use Generator;
 use Laminas\Diactoros\Response;
 use Mezzio\Session\Persistence\CacheHeadersGeneratorTrait;
 use Mezzio\Session\Persistence\Http;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
@@ -46,16 +47,14 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     {
         // test autodiscover lastModified value
         $consumer = $this->createConsumerInstance();
-        self::assertSame($this->getExpectedLastModified(), $consumer->getLastModified());
+        self::assertSame(self::getExpectedLastModified(), $consumer->getLastModified());
 
         // test injected lastModified value
         $consumer = $this->createConsumerInstance(60, '', Http::UNIX_EPOCH);
         self::assertSame(Http::UNIX_EPOCH, $consumer->getLastModified());
     }
 
-    /**
-     * @dataProvider provideCacheHeaderValues
-     */
+    #[DataProvider('provideCacheHeaderValues')]
     public function testResponseAlreadyHasCacheHeaders(
         string $name,
         string $value,
@@ -73,7 +72,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     }
 
     /** @return array<string, array{0: string, 1: string, 2: bool}> */
-    public function provideCacheHeaderValues(): array
+    public static function provideCacheHeaderValues(): array
     {
         return [
             'expires'       => ['Expires', 'Sat, 14 Apr 1945 00:00:00 GMT', true],
@@ -85,7 +84,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     }
 
     /** @return array<string, array{0: string}> */
-    public function provideUnsupportedCacheLimiters(): array
+    public static function provideUnsupportedCacheLimiters(): array
     {
         return [
             'empty'       => [''],
@@ -93,9 +92,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider provideUnsupportedCacheLimiters
-     */
+    #[DataProvider('provideUnsupportedCacheLimiters')]
     public function testDontAddCacheHeadersForEmptyOrUnsupportedCacheLimiter(string $cacheLimiter): void
     {
         $consumer = $this->createConsumerInstance(60, $cacheLimiter);
@@ -108,7 +105,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     }
 
     /** @return Generator<string, array{0: string, 1: string, 2: list<string>}> */
-    public function providePreexistingCacheHeaders(): Generator
+    public static function providePreexistingCacheHeaders(): Generator
     {
         yield 'last-modified' => [
             'Last-Modified',
@@ -152,9 +149,9 @@ class CacheHeadersGeneratorTraitTest extends TestCase
     }
 
     /**
-     * @dataProvider providePreexistingCacheHeaders
      * @param string[] $headersThatShouldNotBePresent
      */
+    #[DataProvider('providePreexistingCacheHeaders')]
     public function testDontAddExtraCacheHeadersIfResponseAlreadyHasAny(
         string $headerName,
         string $headerValue,
@@ -191,7 +188,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         $consumer = $this->createConsumerInstance($cacheExpire, 'public');
         $response = $consumer->addCacheHeadersToResponse(new Response());
 
-        $lastModified = $this->getExpectedLastModified() ?: '';
+        $lastModified = self::getExpectedLastModified() ?: '';
 
         self::assertMatchesRegularExpression(self::GMDATE_REGEXP, $response->getHeaderLine('Expires'));
         self::assertSame(sprintf('public, max-age=%d', $maxAge), $response->getHeaderLine('Cache-Control'));
@@ -207,7 +204,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         $consumer = $this->createConsumerInstance($cacheExpire, 'private');
         $response = $consumer->addCacheHeadersToResponse(new Response());
 
-        $lastModified = $this->getExpectedLastModified() ?: '';
+        $lastModified = self::getExpectedLastModified() ?: '';
 
         self::assertMatchesRegularExpression(self::GMDATE_REGEXP, $response->getHeaderLine('Expires'));
         self::assertSame(sprintf('private, max-age=%d', $maxAge), $response->getHeaderLine('Cache-Control'));
@@ -215,9 +212,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         self::assertFalse($response->hasHeader('Pragma'));
     }
 
-    /**
-     * @dataProvider provideCacheLimiterValues
-     */
+    #[DataProvider('provideCacheLimiterValues')]
     public function testResponseCacheHeadersToResponseWithValidCacheLimiters(
         int $cacheExpire,
         string $cacheLimiter,
@@ -263,11 +258,11 @@ class CacheHeadersGeneratorTraitTest extends TestCase
      *     expected_pragma: string,
      * }>
      */
-    public function provideCacheLimiterValues(): array
+    public static function provideCacheLimiterValues(): array
     {
         $cacheExpire  = 60;
         $maxAge       = (string) (60 * $cacheExpire);
-        $lastModified = $this->getExpectedLastModified();
+        $lastModified = self::getExpectedLastModified();
 
         return [
             'empty'     => [
@@ -313,10 +308,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         ];
     }
 
-    /**
-     * @return string|false
-     */
-    private function getExpectedLastModified()
+    private static function getExpectedLastModified(): string|false
     {
         $lastmod = getlastmod();
         if ($lastmod === false) {

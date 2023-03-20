@@ -9,9 +9,11 @@ use Mezzio\Session\Exception\SessionNotInitializedException;
 use Mezzio\Session\RetrieveSession;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionMiddleware;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
-/** @covers \Mezzio\Session\RetrieveSession */
+#[CoversClass(RetrieveSession::class)]
 final class RetrieveSessionTest extends TestCase
 {
     public function testAnExceptionIsThrownRetrievingTheSessionWhenItCannotBeFoundInAnyRequestAttribute(): void
@@ -26,7 +28,7 @@ final class RetrieveSessionTest extends TestCase
     }
 
     /** @return array<string, array{0: string}> */
-    public function attributeNameProvider(): array
+    public static function attributeNameProvider(): array
     {
         return [
             SessionMiddleware::SESSION_ATTRIBUTE => [SessionMiddleware::SESSION_ATTRIBUTE],
@@ -34,7 +36,7 @@ final class RetrieveSessionTest extends TestCase
         ];
     }
 
-    /** @dataProvider attributeNameProvider */
+    #[DataProvider('attributeNameProvider')]
     public function testSuccessfulSessionRetrieval(string $attributeName): void
     {
         $session = $this->createMock(SessionInterface::class);

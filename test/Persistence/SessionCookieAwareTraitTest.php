@@ -11,6 +11,7 @@ use Laminas\Diactoros\Response;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\ServerRequestFactory;
 use Mezzio\Session\Session;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -66,9 +67,7 @@ class SessionCookieAwareTraitTest extends TestCase
         );
     }
 
-    /**
-     * @dataProvider provideRequestSessionCookieValues
-     */
+    #[DataProvider('provideRequestSessionCookieValues')]
     public function testGetSessionCookieValueFromRequestUsingInjectsCookieParams(
         string $cookieName,
         ?string $cookieValue = null,
@@ -82,9 +81,7 @@ class SessionCookieAwareTraitTest extends TestCase
         self::assertSame($expected, $consumer->getSessionCookieValueFromRequest($request));
     }
 
-    /**
-     * @dataProvider provideRequestSessionCookieValues
-     */
+    #[DataProvider('provideRequestSessionCookieValues')]
     public function testGetSessionCookieValueFromRequestUsingInjectedCookieHeader(
         string $cookieName,
         ?string $cookieValue,
@@ -100,7 +97,7 @@ class SessionCookieAwareTraitTest extends TestCase
     }
 
     /** @return array<array-key, array{0: string, 1: string|null, 2: string}> */
-    public function provideRequestSessionCookieValues(): array
+    public static function provideRequestSessionCookieValues(): array
     {
         $cookieName       = 'SESSIONID';
         $cookieNiceValue  = 'some-nice-value';
@@ -132,9 +129,7 @@ class SessionCookieAwareTraitTest extends TestCase
         self::assertStringEndsWith(sprintf('GMT; Max-Age=%d', $sessionLifetime), $actualHeaderLine);
     }
 
-    /**
-     * @dataProvider provideResponseCookieHeaderLines
-     */
+    #[DataProvider('provideResponseCookieHeaderLines')]
     public function testCreateSessionCookieForResponse(
         string $cookieName,
         ?string $cookieValue,
@@ -153,7 +148,7 @@ class SessionCookieAwareTraitTest extends TestCase
     }
 
     /** @return array<array-key, array{0: string, 1: string|null, 2: int, 3: string}> */
-    public function provideResponseCookieHeaderLines(): array
+    public static function provideResponseCookieHeaderLines(): array
     {
         $cookieName       = 'PHPSESSID';
         $cookieNiceValue  = 'some-nice-value';
@@ -241,9 +236,7 @@ class SessionCookieAwareTraitTest extends TestCase
         self::assertSame($expected, $actual);
     }
 
-    /**
-     * @dataProvider provideSessionCookieLifetimeValues
-     */
+    #[DataProvider('provideSessionCookieLifetimeValues')]
     public function testGetSessionCookieLifetimeReturnsExpectedResults(
         ?int $cookieLifetime,
         ?int $sessionLifetime,
@@ -259,7 +252,7 @@ class SessionCookieAwareTraitTest extends TestCase
     }
 
     /** @return array<string, array{0: int|null, 1: int|null, 2: int}> */
-    public function provideSessionCookieLifetimeValues(): array
+    public static function provideSessionCookieLifetimeValues(): array
     {
         return [
             'default'                 => [null, null, 0],

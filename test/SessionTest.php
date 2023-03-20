@@ -8,6 +8,8 @@ use Mezzio\Session\Session;
 use Mezzio\Session\SessionCookiePersistenceInterface;
 use Mezzio\Session\SessionIdentifierAwareInterface;
 use Mezzio\Session\SessionInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\TestCase;
 
 use function json_decode;
@@ -43,17 +45,13 @@ class SessionTest extends TestCase
         return $regenerated;
     }
 
-    /**
-     * @depends testRegenerateProducesANewInstance
-     */
+    #[Depends('testRegenerateProducesANewInstance')]
     public function testRegeneratedSessionReturnsTrueForIsRegenerated(SessionInterface $session): void
     {
         $this->assertTrue($session->isRegenerated());
     }
 
-    /**
-     * @depends testRegenerateProducesANewInstance
-     */
+    #[Depends('testRegenerateProducesANewInstance')]
     public function testRegeneratedSessionIsChanged(SessionInterface $session): void
     {
         $this->assertTrue($session->hasChanged());
@@ -69,25 +67,19 @@ class SessionTest extends TestCase
         return $session;
     }
 
-    /**
-     * @depends testSettingDataInSessionMakesItAccessible
-     */
+    #[Depends('testSettingDataInSessionMakesItAccessible')]
     public function testSettingDataInSessionChangesSession(SessionInterface $session): void
     {
         $this->assertTrue($session->hasChanged());
     }
 
-    /**
-     * @depends testSettingDataInSessionMakesItAccessible
-     */
+    #[Depends('testSettingDataInSessionMakesItAccessible')]
     public function testToArrayReturnsAllDataPreviouslySet(SessionInterface $session): void
     {
         $this->assertSame(['foo' => 'bar'], $session->toArray());
     }
 
-    /**
-     * @depends testSettingDataInSessionMakesItAccessible
-     */
+    #[Depends('testSettingDataInSessionMakesItAccessible')]
     public function testCanUnsetDataInSession(SessionInterface $session): void
     {
         $session->unset('foo');
@@ -111,9 +103,13 @@ class SessionTest extends TestCase
     /**
      * @psalm-return array<string, array{object, array<array-key, mixed>}>
      */
-    public function serializedDataProvider(): array
+    public static function serializedDataProvider(): array
     {
-        $data = (object) ['test_case' => $this];
+        $data = (object) [
+            'test_case' => new class () {
+                private string $foo = 'bar';
+            },
+        ];
         /** @var array $expected */
         $expected = json_decode(json_encode($data, JSON_PRESERVE_ZERO_FRACTION), true);
         return [
@@ -121,9 +117,7 @@ class SessionTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider serializedDataProvider
-     */
+    #[DataProvider('serializedDataProvider')]
     public function testSetEnsuresDataIsJsonSerializable(object $data, array $expected): void
     {
         $session = new Session([]);
