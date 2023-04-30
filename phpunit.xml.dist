@@ -12,11 +12,11 @@
         displayDetailsOnIncompleteTests="true"
         displayDetailsOnSkippedTests="true"
 >
-    <coverage>
+    <source>
         <include>
             <directory suffix=".php">./src</directory>
         </include>
-    </coverage>
+    </source>
     <testsuites>
         <testsuite name="mezzio-session">
             <directory>./test</directory>
