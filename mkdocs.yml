@@ -3,6 +3,7 @@ site_dir: docs/html
 nav:
     - Home: index.md
     - Introduction: intro.md
+    - Installation: installation.md
     - Usage:
       - "Session Containers": session.md
       - "Session Persistence": persistence.md
@@ -12,3 +13,5 @@ site_description: 'Sessions and session middleware for PSR-7 applications.'
 repo_url: 'https://github.com/mezzio/mezzio-session'
 extra:
     project: Mezzio
+    installation:
+        config_provider_class: 'Mezzio\Session\ConfigProvider'
