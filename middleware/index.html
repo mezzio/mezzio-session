@@ -5,7 +5,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Sessions and session middleware for PSR-7 applications.">  
+    <meta name="description" content="Sessions and session middleware for PSR-7 applications."> 
+
+    
+    
+    <meta name="docsearch:version" content="latest">
+    <meta name="docsearch:language" content="en">
+    <meta name="docsearch:component" content="mezzio-session">
+
     <link rel="canonical" href="https://docs.mezzio.dev/mezzio-session/middleware/">
     <link rel="shortcut icon" href="https://docs.laminas.dev/img/trademark-laminas-foundation-rgb.svg">
 
@@ -143,6 +150,20 @@
                     
                     
                         
+                            <li class="subnavigation__list-item ">
+                                <a href="../installation/" class="subnavigation__link">Installation</a>
+                            </li>
+                        
+                    
+                
+            
+
+                
+                
+
+                    
+                    
+                        
                             <li class="subnavigation__list-item">
                                 <span class="subnavigation__headline">Usage</span>
                                 <ul class="subnavigation__list">
@@ -216,8 +237,8 @@
                     <a href="#" class="header__link header__link--search" data-toggle="modal" data-target="#mkdocs_search_modal" title="Open search">
                         <i class="fa fa-search"></i> Search
                     </a>
-                    <a href="https://github.com/mezzio/mezzio-session/" class="header__link header__link--github" title="Go to repository of mezzio-session">
-                        <i class="fa fa-github"></i> GitHub
+                    <a href="https://github.com/mezzio/mezzio-session" class="header__link header__link--github" title="Go to repository of mezzio-session">
+                        <i class="fab fa-github"></i> GitHub
                     </a>
                 
             </div>
@@ -246,6 +267,10 @@
                 
                     <li class="toc__entry">
                         <a href="#adding-the-middleware-to-your-application" class="toc__link nav-link">Adding the middleware to your application</a>
+                    </li>
+                
+                    <li class="toc__entry">
+                        <a href="#retrieving-the-session-in-your-own-middleware" class="toc__link nav-link">Retrieving the session in your own middleware</a>
                     </li>
                 
             </ul>
@@ -357,6 +382,53 @@ file, or within a <a href="https://docs.mezzio.dev/mezzio/cookbook/autowiring-ro
     \Mezzio\Session\SessionMiddleware::class,
     \User\Middleware\LoginHandler::class
 ]);</code></pre>
+<h2 id="retrieving-the-session-in-your-own-middleware">Retrieving the session in your own middleware</h2>
+<p>Whilst it is trivial to retrieve the initialised session from the request with <code>$session = $request-&gt;getAttribute(SessionInterface::class);</code>, static analysers cannot automatically infer the value assigned to <code>$session</code>.</p>
+<p>To provide a convenient and type safe way to retrieve the session from the current request without manually asserting its type, <code>SessionRetrieval::fromRequest($request)</code> can be called so that you can use the request without further assertions.</p>
+<p>Furthermore, a static method exists to optionally retrieve a session when you cannot be sure the middleware has previously been piped: <code>SessionRetrieval::fromRequestOrNull($request)</code></p>
+<pre class="highlight"><code class="language-php">namespace My\NameSpace;
+
+use Mezzio\Session\Exception\SessionNotInitializedException;
+use Mezzio\Session\RetrieveSession;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
+class MyRequestHandler implements RequestHandlerInterface {
+
+    // ...
+
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        try {
+            $session = RetrieveSession::fromRequest($request);
+        } catch (SessionNotInitializedException $error) {
+            // Handle the uninitialized session:
+            return $this-&gt;redirectToLogin();
+        }
+
+        $value = $session-&gt;get('SomeKey');
+        $this-&gt;templateRenderer-&gt;render('some:template', ['value' =&gt; $value]);
+    }
+}
+
+class AnotherRequestHandler implements RequestHandlerInterface {
+
+    // ...
+
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        $session = RetrieveSession::fromRequestOrNull($request);
+        if (! $session) {
+            // Handle the uninitialized session:
+            return $this-&gt;redirectToLogin();
+        }
+
+        $value = $session-&gt;get('SomeKey');
+        $this-&gt;templateRenderer-&gt;render('some:template', ['value' =&gt; $value]);
+    }
+}
+</code></pre>
 
 
 
@@ -368,7 +440,9 @@ file, or within a <a href="https://docs.mezzio.dev/mezzio/cookbook/autowiring-ro
         <li class="page-nav__item">
             
                 <a rel="prev" class="page-nav__link page-nav__link--prev" href="../persistence/">
-                    <i class="fa fa-chevron-left"></i> Previous
+                    <small class="page-nav__label">Previous</small>
+                    <i class="fa fa-chevron-left"></i>
+                    Session Persistence
                 </a>
             
         </li>
@@ -381,16 +455,6 @@ file, or within a <a href="https://docs.mezzio.dev/mezzio/cookbook/autowiring-ro
 </nav>
 
 
-
-
-    <div class="help-wanted">
-        <p>
-            Found a mistake or want to contribute to the documentation?
-            <a href="https://github.com/mezzio/mezzio-session/edit/master/docs/book/middleware.md" target="_blank" class="help-wanted__link">
-                Edit this page on GitHub!
-            </a>
-        </p>
-    </div>
 
                 
             </div>
@@ -431,6 +495,20 @@ file, or within a <a href="https://docs.mezzio.dev/mezzio/cookbook/autowiring-ro
                         
                             <li class="subnavigation__list-item ">
                                 <a href="../intro/" class="subnavigation__link">Introduction</a>
+                            </li>
+                        
+                    
+                
+            
+
+                
+                
+
+                    
+                    
+                        
+                            <li class="subnavigation__list-item ">
+                                <a href="../installation/" class="subnavigation__link">Installation</a>
                             </li>
                         
                     
@@ -515,13 +593,13 @@ file, or within a <a href="https://docs.mezzio.dev/mezzio/cookbook/autowiring-ro
                                 <a href="https://discourse.laminas.dev" class="support__link" title="Forum"><i class="fa fa-comments"></i></a>
                             </li>
                             <li class="support__list-item">
-                                <a href="https://laminas.dev/chat" class="support__link" title="Chat"><i class="fa fa-slack"></i></a>
+                                <a href="https://laminas.dev/chat" class="support__link" title="Chat"><i class="fab fa-slack"></i></a>
                             </li>
                             <li class="support__list-item">
-                                <a href="https://github.com/laminas" class="support__link" title="Github"><i class="fa fa-github"></i></a>
+                                <a href="https://github.com/laminas" class="support__link" title="Github"><i class="fab fa-github"></i></a>
                             </li>
                             <li class="support__list-item">
-                                <a href="https://twitter.com/getlaminas" class="support__link" title="Twitter"><i class="fa fa-twitter"></i></a>
+                                <a href="https://phpc.social/@getlaminas" class="support__link" title="Mastodon"><i class="fab fa-mastodon"></i></a>
                             </li>
                             <li class="support__list-item">
                                 <a href="https://getlaminas.org/blog/rss.xml" class="support__link" title="Blog feed"><i class="fa fa-rss"></i></a>
@@ -537,7 +615,7 @@ file, or within a <a href="https://docs.mezzio.dev/mezzio/cookbook/autowiring-ro
                         <h4 class="footer__headline">License</h4>
                         <p>
                             Code licensed under <a
-                                href="https://github.com/mezzio/mezzio-session/blob/master/LICENSE.md">BSD 3-Clause</a>.
+                                href="https://github.com/mezzio/mezzio-session/blob/-/LICENSE.md">BSD 3-Clause</a>.
                         </p>
                     </div>
 
@@ -547,7 +625,7 @@ file, or within a <a href="https://docs.mezzio.dev/mezzio/cookbook/autowiring-ro
                         <p>
                             <!--Built with love by the Laminas team with the help of our
                             <a href="https://github.com/mezzio/mezzio-session/graphs/contributors">contributors</a>.<br>-->
-                            &copy; 2021 <a href="https://getlaminas.org/">Laminas Project</a> a Series of LF Projects, LLC.
+                            &copy; 2024 <a href="https://getlaminas.org/">Laminas Project</a> a Series of LF Projects, LLC.
                         </p>
                     </div>
                 </div>
