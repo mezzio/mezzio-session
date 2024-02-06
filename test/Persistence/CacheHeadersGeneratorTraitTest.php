@@ -188,7 +188,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         $consumer = $this->createConsumerInstance($cacheExpire, 'public');
         $response = $consumer->addCacheHeadersToResponse(new Response());
 
-        $lastModified = self::getExpectedLastModified() ?: '';
+        $lastModified = self::getExpectedLastModified() === false ? '' : self::getExpectedLastModified();
 
         self::assertMatchesRegularExpression(self::GMDATE_REGEXP, $response->getHeaderLine('Expires'));
         self::assertSame(sprintf('public, max-age=%d', $maxAge), $response->getHeaderLine('Cache-Control'));
@@ -204,7 +204,7 @@ class CacheHeadersGeneratorTraitTest extends TestCase
         $consumer = $this->createConsumerInstance($cacheExpire, 'private');
         $response = $consumer->addCacheHeadersToResponse(new Response());
 
-        $lastModified = self::getExpectedLastModified() ?: '';
+        $lastModified = self::getExpectedLastModified() === false ? '' : self::getExpectedLastModified();
 
         self::assertMatchesRegularExpression(self::GMDATE_REGEXP, $response->getHeaderLine('Expires'));
         self::assertSame(sprintf('private, max-age=%d', $maxAge), $response->getHeaderLine('Cache-Control'));
@@ -317,6 +317,6 @@ class CacheHeadersGeneratorTraitTest extends TestCase
             $lastmod   = filemtime($classFile);
         }
 
-        return $lastmod ? gmdate(Http::DATE_FORMAT, $lastmod) : false;
+        return $lastmod !== false ? gmdate(Http::DATE_FORMAT, $lastmod) : false;
     }
 }
