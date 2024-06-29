@@ -42,19 +42,19 @@ $ composer require mezzio/mezzio-session-ext
 mezzio-session provides the following:
 
 - Interfaces for:
-  - session containers
-  - session persistence
+    - session containers
+    - session persistence
 - An implementation of the session container.
 - A "lazy-loading" implementation of the session container, to allow delaying
   any de/serialization and/or I/O processes until session data is requested;
   this implementation decorates a normal session container.
 - PSR-7 middleware that:
-  - composes a session persistence implementation.
-  - initializes the lazy-loading session container, using the session
+    - composes a session persistence implementation.
+    - initializes the lazy-loading session container, using the session
     persistence implementation.
-  - delegates to the next middleware, passing the session container into the
+    - delegates to the next middleware, passing the session container into the
     request.
-  - finalizes the session before returning the response.
+    - finalizes the session before returning the response.
 
 Persistence implementations locate session information from the requests (e.g.,
 via a cookie) in order to initialize the session. On completion of the request,
