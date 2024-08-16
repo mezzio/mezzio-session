@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Mezzio\Session;
 
+/**
+ * @deprecated This interface will be removed in version 2.0 of this component.
+ *             The method getId() has been added to SessionInterface.
+ */
 interface SessionIdentifierAwareInterface
 {
     /**
