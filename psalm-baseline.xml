@@ -5,18 +5,31 @@
       <code>generateCacheHeaders</code>
     </UnusedMethod>
   </file>
+  <file src="src/LazySession.php">
+    <DeprecatedInterface>
+      <code>LazySession</code>
+    </DeprecatedInterface>
+  </file>
   <file src="src/RetrieveSession.php">
     <UnusedConstructor>
       <code>__construct</code>
     </UnusedConstructor>
   </file>
   <file src="src/Session.php">
+    <DeprecatedInterface>
+      <code>Session</code>
+    </DeprecatedInterface>
     <MixedInferredReturnType>
       <code>null|bool|int|float|string|array</code>
     </MixedInferredReturnType>
     <MixedReturnStatement>
       <code>json_decode(json_encode($value, JSON_PRESERVE_ZERO_FRACTION), true)</code>
     </MixedReturnStatement>
+  </file>
+  <file src="src/SessionPersistenceInterface.php">
+    <DeprecatedInterface>
+      <code><![CDATA[SessionInterface&SessionIdentifierAwareInterface]]></code>
+    </DeprecatedInterface>
   </file>
   <file src="test/Persistence/CacheHeadersGeneratorTraitTest.php">
     <PossiblyUnusedMethod>
@@ -42,10 +55,5 @@
     <PossiblyUnusedMethod>
       <code>serializedDataProvider</code>
     </PossiblyUnusedMethod>
-  </file>
-  <file src="src/SessionIdentifierAwareInterface.php">
-    <UnusedClass>
-      <code>SessionIdentifierAwareInterface</code>
-    </UnusedClass>
   </file>
 </files>

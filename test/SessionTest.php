@@ -6,6 +6,7 @@ namespace MezzioTest\Session;
 
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionCookiePersistenceInterface;
+use Mezzio\Session\SessionIdentifierAwareInterface;
 use Mezzio\Session\SessionInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Depends;
@@ -123,6 +124,12 @@ class SessionTest extends TestCase
         $session->set('foo', $data);
         $this->assertNotSame($data, $session->get('foo'));
         $this->assertSame($expected, $session->get('foo'));
+    }
+
+    public function testImplementsSessionIdentifierAwareInterface(): void
+    {
+        $session = new Session([]);
+        $this->assertInstanceOf(SessionIdentifierAwareInterface::class, $session);
     }
 
     public function testGetIdReturnsEmptyStringIfNoIdentifierProvidedToConstructor(): void
