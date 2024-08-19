@@ -1,17 +1,37 @@
 docs_dir: docs/book
 site_dir: docs/html
 nav:
-    - Home: index.md
-    - Introduction: intro.md
-    - Installation: installation.md
-    - Usage:
-      - "Session Containers": session.md
-      - "Session Persistence": persistence.md
-      - "Session Middleware": middleware.md
+  - Home: index.md
+  - v2:
+      - Introduction: v2/intro.md
+      - Installation: v2/installation.md
+      - Usage:
+          - "Session Containers": v2/session.md
+          - "Session Persistence": v2/persistence.md
+          - "Session Middleware": v2/middleware.md
+  - v1:
+      - Introduction: v1/intro.md
+      - Installation: v1/installation.md
+      - Usage:
+          - "Session Containers": v1/session.md
+          - "Session Persistence": v1/persistence.md
+          - "Session Middleware": v1/middleware.md
 site_name: mezzio-session
 site_description: 'Sessions and session middleware for PSR-7 applications.'
 repo_url: 'https://github.com/mezzio/mezzio-session'
 extra:
-    project: Mezzio
-    installation:
-        config_provider_class: 'Mezzio\Session\ConfigProvider'
+  project: Mezzio
+  installation:
+    config_provider_class: 'Mezzio\Session\ConfigProvider'
+  current_version: v2
+  versions:
+    - v2
+    - v1
+plugins:
+  - redirects:
+      redirect_maps:
+        intro.md: v1/intro.md
+        installation.md: v1/installation.md
+        session.md: v1/session.md
+        persistence.md: v1/persistence.md
+        middleware.md: v1/middleware.md
