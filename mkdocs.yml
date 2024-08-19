@@ -21,9 +21,9 @@ extra:
       - v1
 plugins:
     - redirects:
-        - redirect_maps:
-            - intro.md: v1/intro.md
-            - installation.md: v1/installation.md
-            - session.md: v1/session.md
-            - persistence.md: v1/persistence.md
-            - middleware.md: v1/middleware.md
+        redirect_maps:
+            intro.md: v1/intro.md
+            installation.md: v1/installation.md
+            session.md: v1/session.md
+            persistence.md: v1/persistence.md
+            middleware.md: v1/middleware.md
