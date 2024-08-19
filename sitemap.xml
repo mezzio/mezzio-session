@@ -2,32 +2,32 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.mezzio.dev/mezzio-session/</loc>
-         <lastmod>2024-08-16</lastmod>
+         <lastmod>2024-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.mezzio.dev/mezzio-session/installation/</loc>
-         <lastmod>2024-08-16</lastmod>
+         <loc>https://docs.mezzio.dev/mezzio-session/v1/installation/</loc>
+         <lastmod>2024-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.mezzio.dev/mezzio-session/intro/</loc>
-         <lastmod>2024-08-16</lastmod>
+         <loc>https://docs.mezzio.dev/mezzio-session/v1/intro/</loc>
+         <lastmod>2024-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.mezzio.dev/mezzio-session/middleware/</loc>
-         <lastmod>2024-08-16</lastmod>
+         <loc>https://docs.mezzio.dev/mezzio-session/v1/middleware/</loc>
+         <lastmod>2024-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.mezzio.dev/mezzio-session/persistence/</loc>
-         <lastmod>2024-08-16</lastmod>
+         <loc>https://docs.mezzio.dev/mezzio-session/v1/persistence/</loc>
+         <lastmod>2024-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.mezzio.dev/mezzio-session/session/</loc>
-         <lastmod>2024-08-16</lastmod>
+         <loc>https://docs.mezzio.dev/mezzio-session/v1/session/</loc>
+         <lastmod>2024-08-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

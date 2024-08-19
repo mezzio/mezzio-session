@@ -15,10 +15,10 @@
     <meta name="docsearch:language" content="en">
     <meta name="docsearch:component" content="mezzio-session">
 
-    <link rel="canonical" href="https://docs.mezzio.dev/mezzio-session/">
+    <link rel="canonical" href="https://docs.mezzio.dev/mezzio-session/v1/middleware/">
     <link rel="shortcut icon" href="https://docs.laminas.dev/img/trademark-laminas-foundation-rgb.svg">
 
-    <title>mezzio-session - Laminas Docs</title>
+    <title>Session Middleware - mezzio-session - Laminas Docs</title>
 
     <link rel="stylesheet" href="https://docs.laminas.dev/css/styles.css">
     
@@ -113,7 +113,7 @@
                     
     <div class="subnavigation hidden-print">
         <h4 class="subnavigation__title">
-            <a href=".">mezzio-session</a>
+            <a href="../..">mezzio-session</a>
         </h4>
 
         <h5 class="subnavigation__subtitle">Table of Contents</h5>
@@ -126,13 +126,13 @@
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/intro/" class="subnavigation__link">Introduction</a>
+        <a href="../intro/" class="subnavigation__link">Introduction</a>
     </li>
 
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/installation/" class="subnavigation__link">Installation</a>
+        <a href="../installation/" class="subnavigation__link">Installation</a>
     </li>
 
                     
@@ -143,19 +143,19 @@
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/session/" class="subnavigation__link">Session Containers</a>
+        <a href="../session/" class="subnavigation__link">Session Containers</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/persistence/" class="subnavigation__link">Session Persistence</a>
+        <a href="../persistence/" class="subnavigation__link">Session Persistence</a>
     </li>
 
             
                 
-    <li class="subnavigation__list-item ">
-        <a href="v1/middleware/" class="subnavigation__link">Session Middleware</a>
+    <li class="subnavigation__list-item subnavigation__list-item--active">
+        <a href="./" class="subnavigation__link">Session Middleware</a>
     </li>
 
             
@@ -225,6 +225,32 @@
             <div class="col-md-9 col-sm-12 content" role="main">
                 
                 
+                    
+    
+
+    
+    
+        <div class="toc">
+            <h6 class="toc__headline">On this page</h6>
+            <ul class="toc__list">
+                
+                    <li class="toc__entry">
+                        <a href="#configuration" class="toc__link nav-link">Configuration</a>
+                    </li>
+                
+                    <li class="toc__entry">
+                        <a href="#adding-the-middleware-to-your-application" class="toc__link nav-link">Adding the middleware to your application</a>
+                    </li>
+                
+                    <li class="toc__entry">
+                        <a href="#retrieving-the-session-in-your-own-middleware" class="toc__link nav-link">Retrieving the session in your own middleware</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+                
 
                 
                     <nav aria-label="breadcrumb">
@@ -234,7 +260,23 @@
             <li class="breadcrumb-item"><a href="https://docs.mezzio.dev/">Mezzio</a></li>
 
             
-                <li class="breadcrumb-item">mezzio-session</li>
+                <li class="breadcrumb-item"><a href="../..">mezzio-session</a></li>
+
+                
+                    
+                        
+                        
+                    
+                
+                    
+                        
+                        
+                            <li class="breadcrumb-item">Usage</li>
+                        
+                    
+                
+
+                <li class="breadcrumb-item active" aria-current="page">Session Middleware</li>
             
         
     </ol>
@@ -244,22 +286,127 @@
 
 
 
-    <h1>mezzio-session</h1>
-<p>Sessions and session middleware for PSR-7 applications.</p>
 
+    
+    
+        <h2 class="chapter__headline">Usage</h2>
+    
 
-    <h2>Installation</h2>
-    <h3>Using Composer</h3>
-    <pre><code class="language-bash">$ composer require mezzio/mezzio-session</code></pre>
+    <h1 id="session-middleware">Session Middleware</h1>
+<p>mezzio-session provides middleware consuming
+<a href="http://www.php-fig.org/psr/psr-7/">PSR-7</a> HTTP message instances, via
+implementation of <a href="https://www.php-fig.org/psr/psr-15/">PSR-15</a>
+interfaces.</p>
+<p>This middleware composes a <a href="../persistence/">persistence</a> instance, and uses that
+in order to generate a session container, which it pushes into the request it
+delegates to the next middleware. Once a response is returned, it uses the
+persistence instance to persist the session data and provide information back to
+the client.</p>
+<p>The above two paragraphs are longer than the body of the middleware
+implementation:</p>
+<pre class="highlight"><code class="language-php">namespace Mezzio\Session;
 
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
-<h2>Support</h2>
-<ul>
-    <li>Issues: <a href="https://github.com/mezzio/mezzio-session/issues">github.com/mezzio/mezzio-session/issues</a></li>
-    <li>Source: <a href="https://github.com/mezzio/mezzio-session">github.com/mezzio/mezzio-session</a></li>
-    <li>Chat: <a href="https://laminas.dev/chat">laminas.dev/chat</a></li>
-    <li>Forum: <a href="https://discourse.laminas.dev/">discourse.laminas.dev</a></li>
-</ul>
+class SessionMiddleware implements MiddlewareInterface
+{
+    public const SESSION_ATTRIBUTE = 'session';
+
+    private $persistence;
+
+    public function __construct(SessionPersistenceInterface $persistence)
+    {
+        $this-&gt;persistence = $persistence;
+    }
+
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler) : ResponseInterface
+    {
+        $session = new LazySession($this-&gt;persistence, $request);
+        $response = $handler-&gt;handle(
+            $request
+                -&gt;withAttribute(self::SESSION_ATTRIBUTE, $session)
+                -&gt;withAttribute(SessionInterface::class, $session)
+        );
+        return $this-&gt;persistence-&gt;persistSession($session, $response);
+    }
+}</code></pre>
+<h2 id="configuration">Configuration</h2>
+<p>This package provides a factory for <code>Mezzio\Session\SessionMiddleware</code>
+via <code>Mezzio\Session\SessionMiddlewareFactory</code>; this factory is
+auto-wired if you are using Mezzio and the laminas-component-installer Composer
+plugin. If not, you will need to wire these into your application.</p>
+<p>The factory depends on one service: <code>Mezzio\Session\SessionPersistenceInterface</code>.
+You will need to either wire in your persistence implementation of choice, or
+have the package providing it do so for you.</p>
+<h2 id="adding-the-middleware-to-your-application">Adding the middleware to your application</h2>
+<p>You may pipe this middleware anywhere in your application. If you want to have
+it available anywhere, pipe it early in your application, prior to any routing.
+As an example, within Mezzio, you could pipe it in the <code>config/pipeline.php</code>
+file:</p>
+<pre class="highlight"><code class="language-php">$app-&gt;pipe(\Mezzio\Session\SessionMiddleware::class);
+$app-&gt;pipe(\Mezzio\Router\Middleware\RouteMiddleware::class);</code></pre>
+<p>This will generally be an inexpensive operation; since the middleware uses a
+<code>LazySession</code> instance, unless your persistence implementation does any work in
+its constructor, the cost is just that of instantiating a few objects.</p>
+<p>However, it's often useful to specifically include such middleware directly in
+the routed middleware pipelines, to ensure other developers are aware of its
+presence in that route's workflow.</p>
+<p>Within Mezzio, you can do this when routing, in your <code>config/routes.php</code>
+file, or within a <a href="https://docs.mezzio.dev/mezzio/cookbook/autowiring-routes-and-pipelines/#delegator-factories">delegator factory</a>:</p>
+<pre class="highlight"><code class="language-php">$app-&gt;post('/login', [
+    \Mezzio\Session\SessionMiddleware::class,
+    \User\Middleware\LoginHandler::class
+]);</code></pre>
+<h2 id="retrieving-the-session-in-your-own-middleware">Retrieving the session in your own middleware</h2>
+<p>Whilst it is trivial to retrieve the initialised session from the request with <code>$session = $request-&gt;getAttribute(SessionInterface::class);</code>, static analysers cannot automatically infer the value assigned to <code>$session</code>.</p>
+<p>To provide a convenient and type safe way to retrieve the session from the current request without manually asserting its type, <code>SessionRetrieval::fromRequest($request)</code> can be called so that you can use the request without further assertions.</p>
+<p>Furthermore, a static method exists to optionally retrieve a session when you cannot be sure the middleware has previously been piped: <code>SessionRetrieval::fromRequestOrNull($request)</code></p>
+<pre class="highlight"><code class="language-php">namespace My\NameSpace;
+
+use Mezzio\Session\Exception\SessionNotInitializedException;
+use Mezzio\Session\RetrieveSession;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+
+class MyRequestHandler implements RequestHandlerInterface {
+
+    // ...
+
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        try {
+            $session = RetrieveSession::fromRequest($request);
+        } catch (SessionNotInitializedException $error) {
+            // Handle the uninitialized session:
+            return $this-&gt;redirectToLogin();
+        }
+
+        $value = $session-&gt;get('SomeKey');
+        $this-&gt;templateRenderer-&gt;render('some:template', ['value' =&gt; $value]);
+    }
+}
+
+class AnotherRequestHandler implements RequestHandlerInterface {
+
+    // ...
+
+    public function handle(ServerRequestInterface $request) : ResponseInterface
+    {
+        $session = RetrieveSession::fromRequestOrNull($request);
+        if (! $session) {
+            // Handle the uninitialized session:
+            return $this-&gt;redirectToLogin();
+        }
+
+        $value = $session-&gt;get('SomeKey');
+        $this-&gt;templateRenderer-&gt;render('some:template', ['value' =&gt; $value]);
+    }
+}
+</code></pre>
 
 
 
@@ -270,16 +417,16 @@
         
         <li class="page-nav__item">
             
+                <a rel="prev" class="page-nav__link page-nav__link--prev" href="../persistence/">
+                    <small class="page-nav__label">Previous</small>
+                    <i class="fa fa-chevron-left"></i>
+                    Session Persistence
+                </a>
+            
         </li>
 
         
         <li class="page-nav__item">
-            
-                <a rel="next" class="page-nav__link page-nav__link--next" href="v1/intro/">
-                    <small class="page-nav__label">Next</small>
-                    Introduction
-                    <i class="fa fa-chevron-right"></i>
-                </a>
             
         </li>
     </ul>
@@ -310,7 +457,7 @@
                     
     <div class="subnavigation hidden-print">
         <h4 class="subnavigation__title">
-            <a href=".">mezzio-session</a>
+            <a href="../..">mezzio-session</a>
         </h4>
 
         <h5 class="subnavigation__subtitle">Table of Contents</h5>
@@ -323,13 +470,13 @@
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/intro/" class="subnavigation__link">Introduction</a>
+        <a href="../intro/" class="subnavigation__link">Introduction</a>
     </li>
 
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/installation/" class="subnavigation__link">Installation</a>
+        <a href="../installation/" class="subnavigation__link">Installation</a>
     </li>
 
                     
@@ -340,19 +487,19 @@
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/session/" class="subnavigation__link">Session Containers</a>
+        <a href="../session/" class="subnavigation__link">Session Containers</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/persistence/" class="subnavigation__link">Session Persistence</a>
+        <a href="../persistence/" class="subnavigation__link">Session Persistence</a>
     </li>
 
             
                 
-    <li class="subnavigation__list-item ">
-        <a href="v1/middleware/" class="subnavigation__link">Session Middleware</a>
+    <li class="subnavigation__list-item subnavigation__list-item--active">
+        <a href="./" class="subnavigation__link">Session Middleware</a>
     </li>
 
             
@@ -448,13 +595,13 @@
 </footer>
 
     <script>
-        let base_url = '.',
+        let base_url = '../..',
             project  = "mezzio",
             siteName = 'mezzio-session';
     </script>
     <script src="https://docs.laminas.dev/js/scripts.js"></script>
     
-        <script src="search/main.js"></script>
+        <script src="../../search/main.js"></script>
     
 
     
@@ -483,8 +630,3 @@
 
 
 </html>
-
-<!--
-MkDocs version : 1.6.0
-Build Date UTC : 2024-08-19 13:35:54.538119+00:00
--->

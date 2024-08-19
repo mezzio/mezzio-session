@@ -15,10 +15,10 @@
     <meta name="docsearch:language" content="en">
     <meta name="docsearch:component" content="mezzio-session">
 
-    <link rel="canonical" href="https://docs.mezzio.dev/mezzio-session/">
+    <link rel="canonical" href="https://docs.mezzio.dev/mezzio-session/v1/intro/">
     <link rel="shortcut icon" href="https://docs.laminas.dev/img/trademark-laminas-foundation-rgb.svg">
 
-    <title>mezzio-session - Laminas Docs</title>
+    <title>Introduction - mezzio-session - Laminas Docs</title>
 
     <link rel="stylesheet" href="https://docs.laminas.dev/css/styles.css">
     
@@ -113,7 +113,7 @@
                     
     <div class="subnavigation hidden-print">
         <h4 class="subnavigation__title">
-            <a href=".">mezzio-session</a>
+            <a href="../..">mezzio-session</a>
         </h4>
 
         <h5 class="subnavigation__subtitle">Table of Contents</h5>
@@ -125,14 +125,14 @@
                 
                     
                         
-    <li class="subnavigation__list-item ">
-        <a href="v1/intro/" class="subnavigation__link">Introduction</a>
+    <li class="subnavigation__list-item subnavigation__list-item--active">
+        <a href="./" class="subnavigation__link">Introduction</a>
     </li>
 
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/installation/" class="subnavigation__link">Installation</a>
+        <a href="../installation/" class="subnavigation__link">Installation</a>
     </li>
 
                     
@@ -143,19 +143,19 @@
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/session/" class="subnavigation__link">Session Containers</a>
+        <a href="../session/" class="subnavigation__link">Session Containers</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/persistence/" class="subnavigation__link">Session Persistence</a>
+        <a href="../persistence/" class="subnavigation__link">Session Persistence</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/middleware/" class="subnavigation__link">Session Middleware</a>
+        <a href="../middleware/" class="subnavigation__link">Session Middleware</a>
     </li>
 
             
@@ -225,6 +225,28 @@
             <div class="col-md-9 col-sm-12 content" role="main">
                 
                 
+                    
+    
+
+    
+    
+        <div class="toc">
+            <h6 class="toc__headline">On this page</h6>
+            <ul class="toc__list">
+                
+                    <li class="toc__entry">
+                        <a href="#installation" class="toc__link nav-link">Installation</a>
+                    </li>
+                
+                    <li class="toc__entry">
+                        <a href="#features" class="toc__link nav-link">Features</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+                
 
                 
                     <nav aria-label="breadcrumb">
@@ -234,7 +256,16 @@
             <li class="breadcrumb-item"><a href="https://docs.mezzio.dev/">Mezzio</a></li>
 
             
-                <li class="breadcrumb-item">mezzio-session</li>
+                <li class="breadcrumb-item"><a href="../..">mezzio-session</a></li>
+
+                
+                    
+                        
+                        
+                    
+                
+
+                <li class="breadcrumb-item active" aria-current="page">Introduction</li>
             
         
     </ol>
@@ -244,21 +275,74 @@
 
 
 
-    <h1>mezzio-session</h1>
-<p>Sessions and session middleware for PSR-7 applications.</p>
 
+    
+    
 
-    <h2>Installation</h2>
-    <h3>Using Composer</h3>
-    <pre><code class="language-bash">$ composer require mezzio/mezzio-session</code></pre>
-
-
-<h2>Support</h2>
+    <h1 id="mezzio-session">mezzio-session</h1>
+<p>Web applications often need to persist user state between requests, and the
+generally accepted way to do so is via <em>sessions</em>. While PHP provides its own
+session extension, it:</p>
 <ul>
-    <li>Issues: <a href="https://github.com/mezzio/mezzio-session/issues">github.com/mezzio/mezzio-session/issues</a></li>
-    <li>Source: <a href="https://github.com/mezzio/mezzio-session">github.com/mezzio/mezzio-session</a></li>
-    <li>Chat: <a href="https://laminas.dev/chat">laminas.dev/chat</a></li>
-    <li>Forum: <a href="https://discourse.laminas.dev/">discourse.laminas.dev</a></li>
+<li>uses global functions that affect global state.</li>
+<li>relies on a superglobal for access to both read and write the session data.</li>
+<li>incurs either filesystem or network I/O on every request, depending on the
+  session storage handler.</li>
+<li>can clobber the <code>Set-Cookie</code> header when other processes also set it.</li>
+</ul>
+<p>Some projects, such as <a href="https://github.com/psr7-sessions/storageless">psr-7-sessions/storageless</a>,
+take a different approach, using <a href="https://tools.ietf.org/html/rfc7519">JSON Web Tokens</a> (JWT).</p>
+<p>The goals of mezzio-session are:</p>
+<ul>
+<li>to abstract the way users interact with session storage.</li>
+<li>to abstract how sessions are persisted, to allow both standard ext-session,
+  but also other paradigms such as JWT.</li>
+<li>to provide session capabilities that "play nice" with
+  <a href="http://www.php-fig.org/psr/psr-7/">PSR-7</a> and middleware.</li>
+</ul>
+<h2 id="installation">Installation</h2>
+<p>Use <a href="https://getcomposer.org">Composer</a> to install this package:</p>
+<pre class="highlight"><code class="language-bash">$ composer require mezzio/mezzio-session</code></pre>
+<p>However, the package is not immediately useful unless you have a persistence
+adapter. If you are okay with using ext-session, you can install the following
+package as well:</p>
+<pre class="highlight"><code class="language-bash">$ composer require mezzio/mezzio-session-ext</code></pre>
+<h2 id="features">Features</h2>
+<p>mezzio-session provides the following:</p>
+<ul>
+<li>Interfaces for:<ul>
+<li>session containers</li>
+<li>session persistence</li>
+</ul>
+</li>
+<li>An implementation of the session container.</li>
+<li>A "lazy-loading" implementation of the session container, to allow delaying
+  any de/serialization and/or I/O processes until session data is requested;
+  this implementation decorates a normal session container.</li>
+<li>PSR-7 middleware that:<ul>
+<li>composes a session persistence implementation.</li>
+<li>initializes the lazy-loading session container, using the session
+persistence implementation.</li>
+<li>delegates to the next middleware, passing the session container into the
+request.</li>
+<li>finalizes the session before returning the response.</li>
+</ul>
+</li>
+</ul>
+<p>Persistence implementations locate session information from the requests (e.g.,
+via a cookie) in order to initialize the session. On completion of the request,
+they examine the session container for changes and/or to see if it is empty, and
+provide data to the response so as to notify the client of the session (e.g.,
+via a <code>Set-Cookie</code> header).</p>
+<p>Note that the goals of this package are solely focused on <em>session persistence</em>
+and <em>access to session data by middleware</em>. If you also need other features
+often related to session data, you may want to consider the following packages:</p>
+<ul>
+<li><a href="https://github.com/mezzio/mezzio-flash">mezzio-flash</a>:
+  provides flash message capabilities.</li>
+<li><a href="https://github.com/mezzio/mezzio-csrf">mezzio-csrf</a>:
+  provides CSRF token generation, storage, and verification, using either a
+  session container, or flash messages.</li>
 </ul>
 
 
@@ -270,14 +354,20 @@
         
         <li class="page-nav__item">
             
+                <a rel="prev" class="page-nav__link page-nav__link--prev" href="../..">
+                    <small class="page-nav__label">Previous</small>
+                    <i class="fa fa-chevron-left"></i>
+                    Home
+                </a>
+            
         </li>
 
         
         <li class="page-nav__item">
             
-                <a rel="next" class="page-nav__link page-nav__link--next" href="v1/intro/">
+                <a rel="next" class="page-nav__link page-nav__link--next" href="../installation/">
                     <small class="page-nav__label">Next</small>
-                    Introduction
+                    Installation
                     <i class="fa fa-chevron-right"></i>
                 </a>
             
@@ -310,7 +400,7 @@
                     
     <div class="subnavigation hidden-print">
         <h4 class="subnavigation__title">
-            <a href=".">mezzio-session</a>
+            <a href="../..">mezzio-session</a>
         </h4>
 
         <h5 class="subnavigation__subtitle">Table of Contents</h5>
@@ -322,14 +412,14 @@
                 
                     
                         
-    <li class="subnavigation__list-item ">
-        <a href="v1/intro/" class="subnavigation__link">Introduction</a>
+    <li class="subnavigation__list-item subnavigation__list-item--active">
+        <a href="./" class="subnavigation__link">Introduction</a>
     </li>
 
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/installation/" class="subnavigation__link">Installation</a>
+        <a href="../installation/" class="subnavigation__link">Installation</a>
     </li>
 
                     
@@ -340,19 +430,19 @@
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/session/" class="subnavigation__link">Session Containers</a>
+        <a href="../session/" class="subnavigation__link">Session Containers</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/persistence/" class="subnavigation__link">Session Persistence</a>
+        <a href="../persistence/" class="subnavigation__link">Session Persistence</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/middleware/" class="subnavigation__link">Session Middleware</a>
+        <a href="../middleware/" class="subnavigation__link">Session Middleware</a>
     </li>
 
             
@@ -448,13 +538,13 @@
 </footer>
 
     <script>
-        let base_url = '.',
+        let base_url = '../..',
             project  = "mezzio",
             siteName = 'mezzio-session';
     </script>
     <script src="https://docs.laminas.dev/js/scripts.js"></script>
     
-        <script src="search/main.js"></script>
+        <script src="../../search/main.js"></script>
     
 
     
@@ -483,8 +573,3 @@
 
 
 </html>
-
-<!--
-MkDocs version : 1.6.0
-Build Date UTC : 2024-08-19 13:35:54.538119+00:00
--->

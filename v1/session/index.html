@@ -15,10 +15,10 @@
     <meta name="docsearch:language" content="en">
     <meta name="docsearch:component" content="mezzio-session">
 
-    <link rel="canonical" href="https://docs.mezzio.dev/mezzio-session/">
+    <link rel="canonical" href="https://docs.mezzio.dev/mezzio-session/v1/session/">
     <link rel="shortcut icon" href="https://docs.laminas.dev/img/trademark-laminas-foundation-rgb.svg">
 
-    <title>mezzio-session - Laminas Docs</title>
+    <title>Session Containers - mezzio-session - Laminas Docs</title>
 
     <link rel="stylesheet" href="https://docs.laminas.dev/css/styles.css">
     
@@ -113,7 +113,7 @@
                     
     <div class="subnavigation hidden-print">
         <h4 class="subnavigation__title">
-            <a href=".">mezzio-session</a>
+            <a href="../..">mezzio-session</a>
         </h4>
 
         <h5 class="subnavigation__subtitle">Table of Contents</h5>
@@ -126,13 +126,13 @@
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/intro/" class="subnavigation__link">Introduction</a>
+        <a href="../intro/" class="subnavigation__link">Introduction</a>
     </li>
 
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/installation/" class="subnavigation__link">Installation</a>
+        <a href="../installation/" class="subnavigation__link">Installation</a>
     </li>
 
                     
@@ -142,20 +142,20 @@
         <ul class="subnavigation__list">
             
                 
-    <li class="subnavigation__list-item ">
-        <a href="v1/session/" class="subnavigation__link">Session Containers</a>
+    <li class="subnavigation__list-item subnavigation__list-item--active">
+        <a href="./" class="subnavigation__link">Session Containers</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/persistence/" class="subnavigation__link">Session Persistence</a>
+        <a href="../persistence/" class="subnavigation__link">Session Persistence</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/middleware/" class="subnavigation__link">Session Middleware</a>
+        <a href="../middleware/" class="subnavigation__link">Session Middleware</a>
     </li>
 
             
@@ -225,6 +225,32 @@
             <div class="col-md-9 col-sm-12 content" role="main">
                 
                 
+                    
+    
+
+    
+    
+        <div class="toc">
+            <h6 class="toc__headline">On this page</h6>
+            <ul class="toc__list">
+                
+                    <li class="toc__entry">
+                        <a href="#usage" class="toc__link nav-link">Usage</a>
+                    </li>
+                
+                    <li class="toc__entry">
+                        <a href="#lazy-sessions" class="toc__link nav-link">Lazy Sessions</a>
+                    </li>
+                
+                    <li class="toc__entry">
+                        <a href="#session-regeneration" class="toc__link nav-link">Session Regeneration</a>
+                    </li>
+                
+            </ul>
+        </div>
+    
+
+                
 
                 
                     <nav aria-label="breadcrumb">
@@ -234,7 +260,23 @@
             <li class="breadcrumb-item"><a href="https://docs.mezzio.dev/">Mezzio</a></li>
 
             
-                <li class="breadcrumb-item">mezzio-session</li>
+                <li class="breadcrumb-item"><a href="../..">mezzio-session</a></li>
+
+                
+                    
+                        
+                        
+                    
+                
+                    
+                        
+                        
+                            <li class="breadcrumb-item">Usage</li>
+                        
+                    
+                
+
+                <li class="breadcrumb-item active" aria-current="page">Session Containers</li>
             
         
     </ol>
@@ -244,22 +286,233 @@
 
 
 
-    <h1>mezzio-session</h1>
-<p>Sessions and session middleware for PSR-7 applications.</p>
 
+    
+    
+        <h2 class="chapter__headline">Usage</h2>
+    
 
-    <h2>Installation</h2>
-    <h3>Using Composer</h3>
-    <pre><code class="language-bash">$ composer require mezzio/mezzio-session</code></pre>
+    <h1 id="session-containers">Session Containers</h1>
+<p>Session containers are the primary interface with which most application
+developers will work; they contain the data currently in the session, and allow
+you to push data to the session.</p>
+<p>All session containers implement <code>Mezzio\Session\SessionInterface</code>:</p>
+<pre class="highlight"><code class="language-php">namespace Mezzio\Session;
 
+interface SessionInterface
+{
+    /**
+     * Serialize the session data to an array for storage purposes.
+     */
+    public function toArray() : array;
 
-<h2>Support</h2>
+    /**
+     * Retrieve a value from the session.
+     *
+     * @param mixed $default Default value to return if $name does not exist.
+     * @return mixed
+     */
+    public function get(string $name, $default = null);
+
+    /**
+     * Whether or not the container has the given key.
+     */
+    public function has(string $name) : bool;
+
+    /**
+     * Set a value within the session.
+     *
+     * Values MUST be serializable in any format; we recommend ensuring the
+     * values are JSON serializable for greatest portability.
+     *
+     * @param mixed $value
+     */
+    public function set(string $name, $value) : void;
+
+    /**
+     * Remove a value from the session.
+     */
+    public function unset(string $name) : void;
+
+    /**
+     * Clear all values.
+     */
+    public function clear() : void;
+
+    /**
+     * Does the session contain changes? If not, the middleware handling
+     * session persistence may not need to do more work.
+     */
+    public function hasChanged() : bool;
+
+    /**
+     * Regenerate the session.
+     *
+     * This can be done to prevent session fixation. When executed, it SHOULD
+     * return a new instance; that instance should always return true for
+     * isRegenerated().
+     *
+     * An example of where this WOULD NOT return a new instance is within the
+     * shipped LazySession, where instead it would return itself, after
+     * internally re-setting the proxied session.
+     */
+    public function regenerate(): SessionInterface;
+
+    /**
+     * Method to determine if the session was regenerated; should return
+     * true if the instance was produced via regenerate().
+     */
+    public function isRegenerated() : bool;
+}</code></pre>
+<p>The default implementation, and the one you'll most likely interact with, is
+<code>Mezzio\Session\Session</code>.</p>
+<p>Since version 1.1.0, we provide <code>Mezzio\Session\SessionIdentifierAwareInterface</code>:</p>
+<pre class="highlight"><code class="language-php">namespace Mezzio\Session;
+
+interface SessionIdentifierAwareInterface
+{
+    /**
+     * Retrieve the session identifier.
+     *
+     * This feature was added in 1.1.0 to allow the session persistence to be
+     * stateless. Previously, persistence implementations had to store the
+     * session identifier between calls to initializeSessionFromRequest() and
+     * persistSession(). When SessionInterface implementations also implement
+     * this method, the persistence implementation no longer needs to store it.
+     *
+     * This method will become a part of the SessionInterface in 2.0.0.
+     *
+     * @since 1.1.0
+     */
+    public function getId() : string;
+}</code></pre>
+<p>Since version 1.2.0, we provide <code>Mezzio\Session\SessionCookiePersistenceInterface</code>:</p>
+<pre class="highlight"><code class="language-php">namespace Mezzio\Session;
+
+/**
+ * Allow marking session cookies as persistent.
+ *
+ * It can be useful to mark a session as persistent: e.g., for a "Remember Me"
+ * feature when logging a user into your system. PHP provides this capability
+ * via ext-session with the $lifetime argument to session_set_cookie_params()
+ * as well as by the session.cookie_lifetime INI setting. The latter will set
+ * the value for all session cookies sent (or until the value is changed via
+ * an ini_set() call), while the former will only affect cookies created during
+ * the current script lifetime.
+ *
+ * Persistence engines may, of course, allow setting a global lifetime. This
+ * interface allows developers to set the lifetime programmatically. Persistence
+ * implementations are encouraged to use the value to set the cookie lifetime
+ * when creating and returning a cookie. Additionally, to ensure the cookie
+ * lifetime originally requested is honored when a session is regenerated, we
+ * recommend persistence engines to store the TTL in the session data itself,
+ * so that it can be re-sent in such scenarios.
+ */
+interface SessionCookiePersistenceInterface
+{
+    const SESSION_LIFETIME_KEY = '__SESSION_TTL__';
+
+    /**
+     * Define how long the session cookie should live.
+     *
+     * Use this value to detail to the session persistence engine how long the
+     * session cookie should live.
+     *
+     * This value could be passed as the $lifetime value of
+     * session_set_cookie_params(), or used to create an Expires or Max-Age
+     * parameter for a session cookie.
+     *
+     * Since cookie lifetime is communicated by the server to the client, and
+     * not vice versa, the value should likely be persisted in the session
+     * itself, to ensure that session regeneration uses the same value. We
+     * recommend using the SESSION_LIFETIME_KEY value to communicate this.
+     *
+     * @param int $duration Number of seconds the cookie should persist for.
+     */
+    public function persistSessionFor(int $duration) : void;
+
+    /**
+     * Determine how long the session cookie should live.
+     *
+     * Generally, this will return the value provided to persistFor().
+     *
+     * If that method has not been called, the value can return one of the
+     * following:
+     *
+     * - 0 or a negative value, to indicate the cookie should be treated as a
+     *   session cookie, and expire when the window is closed. This should be
+     *   the default behavior.
+     * - If persistFor() was provided during session creation or anytime later,
+     *   the persistence engine should pull the TTL value from the session itself
+     *   and return it here. Typically, this value should be communicated via
+     *   the SESSION_LIFETIME_KEY value of the session.
+     */
+    public function getSessionLifetime() : int;
+}</code></pre>
+<p><code>Mezzio\Session\Session</code> and <code>Mezzio\Session\LazySession</code> both
+implement each of the interfaces listed above. <code>Session</code> accepts an optional
+identifier to its constructor, and will use the value of the
+<code>SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY</code> in the provided data
+to seed the session cookie lifetime, if present.</p>
+<h2 id="usage">Usage</h2>
+<p>Session containers will typically be passed to your middleware using the
+<a href="../middleware/">SessionMiddleware</a>, via the
+<code>Mezzio\Session\SessionMiddleware::SESSION_ATTRIBUTE</code> ("session") or the
+<code>Mezzio\Session\SessionInterface::class</code> ("Mezzio\Session\SessionInterface";
+available since version 1.4.0) request attribute.</p>
+<p>Once you have the container, you can check for data:</p>
+<pre class="highlight"><code class="language-php">if ($session-&gt;has('user')) {
+}</code></pre>
+<p>and retrieve it:</p>
+<pre class="highlight"><code class="language-php">$user = $session-&gt;get('user');</code></pre>
+<p>You can combine those operations, by passing a default value as a second
+argument to the <code>get()</code> method:</p>
+<pre class="highlight"><code class="language-php">$user = $session-&gt;get('user', new GuestUser());</code></pre>
+<p>If a datum is no longer relevant in the session, <code>unset()</code> it:</p>
+<pre class="highlight"><code class="language-php">$session-&gt;unset('user');</code></pre>
+<p>If none of the data is relevant, <code>clear()</code> the session:</p>
+<pre class="highlight"><code class="language-php">$session-&gt;clear();</code></pre>
+<h3 id="persistent-sessions">Persistent Sessions</h3>
 <ul>
-    <li>Issues: <a href="https://github.com/mezzio/mezzio-session/issues">github.com/mezzio/mezzio-session/issues</a></li>
-    <li>Source: <a href="https://github.com/mezzio/mezzio-session">github.com/mezzio/mezzio-session</a></li>
-    <li>Chat: <a href="https://laminas.dev/chat">laminas.dev/chat</a></li>
-    <li>Forum: <a href="https://discourse.laminas.dev/">discourse.laminas.dev</a></li>
+<li>Since 1.2.0</li>
 </ul>
+<p>You can hint to the session persistence engine how long the session should
+persist:</p>
+<pre class="highlight"><code class="language-php">$session-&gt;persistSessionFor(60 * 60 * 24 * 7); // persist for 7 days</code></pre>
+<p>To make the session expire when the browser session is terminated (default
+behavior), use zero or a negative integer:</p>
+<pre class="highlight"><code class="language-php">$session-&gt;persistSessionFor(0); // expire data after session is over</code></pre>
+<h2 id="lazy-sessions">Lazy Sessions</h2>
+<p>This package provides another implementation of <code>SessionInterface</code> via
+<code>Mezzio\Session\LazySession</code>. This implementation does the following:</p>
+<ul>
+<li>It composes a <a href="../persistence/">persistence</a> instance, along with the current
+  request.</li>
+<li>On <em>first access</em> (e.g., <code>get()</code>, <code>set()</code>, etc.), it uses the composed
+  persistence and request instances to generate the <em>actual</em> session container.
+  All methods then <em>proxy</em> to this container.</li>
+</ul>
+<p>This approach helps delay any I/O or network operations, and/or
+deserialization, until they are actually needed.</p>
+<p>The shipped <a href="../middleware/">SessionMiddleware</a> produces a <code>LazySession</code>.</p>
+<h2 id="session-regeneration">Session Regeneration</h2>
+<p>Some application events benefit from <em>session regeneration</em>. In particular,
+after a user has successfully logged in or out, you will generally want to
+regenerate the session in order to prevent session fixation and the attack
+vectors it invites.</p>
+<p>In those situations, call <code>regenerate()</code>:</p>
+<pre class="highlight"><code class="language-php">$newSession = $session-&gt;regenerate();</code></pre>
+<p>The interface indicates that a new instance <em>should</em> be returned. However, in
+the default usage, you will have a <code>LazySession</code> instance (as described above),
+which <em>decorates</em> the underlying session storage. This is done for two reasons:</p>
+<ul>
+<li>First, the stated reasons of preventing the need to deserialize data and/or
+  perform I/O access until the last moment.</li>
+<li>Second, to ensure that the <code>SessionMiddleware</code> <em>always has a pointer to the
+  session</em>.</li>
+</ul>
+<p>This latter is what allows you to regenerate the session in middleware nested
+deep in your application, but still have the data persisted correctly.</p>
 
 
 
@@ -270,14 +523,20 @@
         
         <li class="page-nav__item">
             
+                <a rel="prev" class="page-nav__link page-nav__link--prev" href="../installation/">
+                    <small class="page-nav__label">Previous</small>
+                    <i class="fa fa-chevron-left"></i>
+                    Installation
+                </a>
+            
         </li>
 
         
         <li class="page-nav__item">
             
-                <a rel="next" class="page-nav__link page-nav__link--next" href="v1/intro/">
+                <a rel="next" class="page-nav__link page-nav__link--next" href="../persistence/">
                     <small class="page-nav__label">Next</small>
-                    Introduction
+                    Session Persistence
                     <i class="fa fa-chevron-right"></i>
                 </a>
             
@@ -310,7 +569,7 @@
                     
     <div class="subnavigation hidden-print">
         <h4 class="subnavigation__title">
-            <a href=".">mezzio-session</a>
+            <a href="../..">mezzio-session</a>
         </h4>
 
         <h5 class="subnavigation__subtitle">Table of Contents</h5>
@@ -323,13 +582,13 @@
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/intro/" class="subnavigation__link">Introduction</a>
+        <a href="../intro/" class="subnavigation__link">Introduction</a>
     </li>
 
                     
                         
     <li class="subnavigation__list-item ">
-        <a href="v1/installation/" class="subnavigation__link">Installation</a>
+        <a href="../installation/" class="subnavigation__link">Installation</a>
     </li>
 
                     
@@ -339,20 +598,20 @@
         <ul class="subnavigation__list">
             
                 
-    <li class="subnavigation__list-item ">
-        <a href="v1/session/" class="subnavigation__link">Session Containers</a>
+    <li class="subnavigation__list-item subnavigation__list-item--active">
+        <a href="./" class="subnavigation__link">Session Containers</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/persistence/" class="subnavigation__link">Session Persistence</a>
+        <a href="../persistence/" class="subnavigation__link">Session Persistence</a>
     </li>
 
             
                 
     <li class="subnavigation__list-item ">
-        <a href="v1/middleware/" class="subnavigation__link">Session Middleware</a>
+        <a href="../middleware/" class="subnavigation__link">Session Middleware</a>
     </li>
 
             
@@ -448,13 +707,13 @@
 </footer>
 
     <script>
-        let base_url = '.',
+        let base_url = '../..',
             project  = "mezzio",
             siteName = 'mezzio-session';
     </script>
     <script src="https://docs.laminas.dev/js/scripts.js"></script>
     
-        <script src="search/main.js"></script>
+        <script src="../../search/main.js"></script>
     
 
     
@@ -483,8 +742,3 @@
 
 
 </html>
-
-<!--
-MkDocs version : 1.6.0
-Build Date UTC : 2024-08-19 13:35:54.538119+00:00
--->
