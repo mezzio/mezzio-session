@@ -19,7 +19,6 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 final class LazySession implements
     SessionCookiePersistenceInterface,
-    SessionIdentifierAwareInterface,
     SessionInterface,
     InitializeSessionIdInterface
 {
@@ -110,10 +109,7 @@ final class LazySession implements
      */
     public function getId(): string
     {
-        $proxiedSession = $this->getProxiedSession();
-        return $proxiedSession instanceof SessionIdentifierAwareInterface
-            ? $proxiedSession->getId()
-            : '';
+        return $this->getProxiedSession()->getId();
     }
 
     /**
