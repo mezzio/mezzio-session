@@ -71,18 +71,11 @@ session:
 The first approach is problematic when using mezzio-session in an async
 environment such as [Swoole](https://swoole.co.uk) or
 [ReactPHP](https://reactphp.org), as the same persistence instance may be used
-by several simultaneous requests. As such, version 1.1.0 introduces a new
-interface for `Mezzio\Session\SessionInterface` implementations to use:
-`Mezzio\Session\SessionIdentifierAwareInterface`. This interface
-defines a single method, `getId()`; implementations can thus store the
+by several simultaneous requests. `Mezzio\Session\SessionInterface` defines a new
+`getId` method, implementations can thus store the
 identifier internally, and, when it comes time to store the session data,
 persistence implementations can query that method in order to retrieve the
 session identifier.
-
-Considering that persistence implementations also _create_ the session instance,
-we recommend that implementations only create instances that implement the
-`SessionIdentifierAwareInterface` going forward in order to make themselves
-async compatible.
 
 ## Persistent sessions
 

@@ -13,7 +13,6 @@ use const JSON_PRESERVE_ZERO_FRACTION;
 
 class Session implements
     SessionCookiePersistenceInterface,
-    SessionIdentifierAwareInterface,
     SessionInterface
 {
     /**
