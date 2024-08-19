@@ -21,7 +21,7 @@ extra:
       - v1
 plugins:
     - redirects:
-        - redirect_maps:
+        redirect_maps:
             - intro.md: v1/intro.md
             - installation.md: v1/installation.md
             - session.md: v1/session.md
