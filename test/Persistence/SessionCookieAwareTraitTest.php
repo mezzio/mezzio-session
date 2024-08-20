@@ -118,7 +118,7 @@ class SessionCookieAwareTraitTest extends TestCase
 
         $consumer = $this->createConsumerInstance($cookieName);
 
-        $session = new Session([]);
+        $session = new Session([], 'test');
         $session->persistSessionFor($sessionLifetime);
         $response = $consumer->addSessionCookieHeaderToResponse(new Response(), $cookieValue, $session);
 
@@ -243,7 +243,7 @@ class SessionCookieAwareTraitTest extends TestCase
         int $expected
     ): void {
         $consumer = $this->createConsumerInstance('SESSIONCOOKIENAME', $cookieLifetime ?? 0);
-        $session  = new Session([]);
+        $session  = new Session([], 'test');
         if (isset($sessionLifetime)) {
             $session->persistSessionFor($sessionLifetime);
         }
@@ -277,7 +277,7 @@ class SessionCookieAwareTraitTest extends TestCase
         $cookieValue = 'session-cookie-value';
 
         $consumer = $this->createConsumerInstance($cookieName, null, null, null, null, null, null, true);
-        $session  = new Session(['foo' => 'bar']);
+        $session  = new Session(['foo' => 'bar'], 'test');
         $session->clear();
         $response = $consumer->addSessionCookieHeaderToResponse(new Response(), $cookieValue, $session);
 

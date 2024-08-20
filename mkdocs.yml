@@ -30,8 +30,8 @@ extra:
 plugins:
     - redirects:
         redirect_maps:
-            intro.md: v1/intro.md
-            installation.md: v1/installation.md
-            session.md: v1/session.md
-            persistence.md: v1/persistence.md
-            middleware.md: v1/middleware.md
+            intro.md: v2/intro.md
+            installation.md: v2/installation.md
+            session.md: v2/session.md
+            persistence.md: v2/persistence.md
+            middleware.md: v2/middleware.md

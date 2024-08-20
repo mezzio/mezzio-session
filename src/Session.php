@@ -30,6 +30,8 @@ class Session implements
      * when it is time to persist the session, instead of relying on state in
      * the persistence instance (which may be shared between multiple
      * requests).
+     *
+     * @psalm-var non-empty-string
      */
     private string $id;
 
@@ -47,8 +49,11 @@ class Session implements
      */
     private int $sessionLifetime = 0;
 
-    /** @param array<string, mixed> $data */
-    public function __construct(array $data, string $id = '')
+    /**
+     * @param array<string, mixed> $data
+     * @psalm-param non-empty-string $id
+     */
+    public function __construct(array $data, string $id)
     {
         $this->data = $this->originalData = $data;
         $this->id   = $id;
@@ -141,6 +146,7 @@ class Session implements
     /**
      * {@inheritDoc}
      *
+     * @return non-empty-string
      * @since 1.1.0
      */
     public function getId(): string
