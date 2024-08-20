@@ -47,9 +47,7 @@ class Session implements
      */
     private int $sessionLifetime = 0;
 
-    /**
-     * @param array<string, mixed> $data
-     */
+    /** @param array<string, mixed> $data */
     public function __construct(array $data, string $id = '')
     {
         $this->data = $this->originalData = $data;
