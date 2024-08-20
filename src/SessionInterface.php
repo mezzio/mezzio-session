@@ -71,8 +71,6 @@ interface SessionInterface
 
     /**
      * Retrieve the session identifier.
-     *
-     * @return non-empty-string
      */
     public function getId(): string;
 }
