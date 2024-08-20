@@ -125,6 +125,12 @@ class SessionTest extends TestCase
         $this->assertSame($expected, $session->get('foo'));
     }
 
+    public function testGetIdReturnsEmptyStringIfNoIdentifierProvidedToConstructor(): void
+    {
+        $session = new Session([]);
+        $this->assertSame('', $session->getId());
+    }
+
     public function testGetIdReturnsValueProvidedToConstructor(): void
     {
         $session = new Session([], '1234abcd');
