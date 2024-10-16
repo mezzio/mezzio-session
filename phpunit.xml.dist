@@ -7,10 +7,15 @@
         cacheDirectory=".phpunit.cache"
         displayDetailsOnTestsThatTriggerErrors="true"
         displayDetailsOnTestsThatTriggerDeprecations="true"
+        displayDetailsOnPhpunitDeprecations="true"
         displayDetailsOnTestsThatTriggerNotices="true"
         displayDetailsOnTestsThatTriggerWarnings="true"
         displayDetailsOnIncompleteTests="true"
         displayDetailsOnSkippedTests="true"
+        failOnPhpunitDeprecation="true"
+        failOnWarning="true"
+        failOnNotice="true"
+        failOnDeprecation="true"
 >
     <source>
         <include>
