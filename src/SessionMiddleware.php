@@ -14,11 +14,8 @@ class SessionMiddleware implements MiddlewareInterface
 {
     public const SESSION_ATTRIBUTE = 'session';
 
-    private SessionPersistenceInterface $persistence;
-
-    public function __construct(SessionPersistenceInterface $persistence)
+    public function __construct(private readonly SessionPersistenceInterface $persistence)
     {
-        $this->persistence = $persistence;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface

@@ -23,19 +23,15 @@ final class LazySession implements
     SessionInterface,
     InitializeSessionIdInterface
 {
-    private SessionPersistenceInterface $persistence;
-
     private ?SessionInterface $proxiedSession = null;
 
-    /**
-     * Request instance to use when calling $persistence->initializeSessionFromRequest()
-     */
-    private ServerRequestInterface $request;
-
-    public function __construct(SessionPersistenceInterface $persistence, ServerRequestInterface $request)
-    {
-        $this->persistence = $persistence;
-        $this->request     = $request;
+    public function __construct(
+        private readonly SessionPersistenceInterface $persistence,
+        /**
+         * Request instance to use when calling $persistence->initializeSessionFromRequest()
+         */
+        private readonly ServerRequestInterface $request
+    ) {
     }
 
     public function regenerate(): SessionInterface

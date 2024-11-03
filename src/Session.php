@@ -23,17 +23,6 @@ class Session implements
      */
     private array $data;
 
-    /**
-     * The session identifier, if any.
-     *
-     * This is present in the session to allow the session persistence
-     * implementation to be stateless. When present here, we can query for it
-     * when it is time to persist the session, instead of relying on state in
-     * the persistence instance (which may be shared between multiple
-     * requests).
-     */
-    private string $id;
-
     private bool $isRegenerated = false;
 
     /**
@@ -49,10 +38,20 @@ class Session implements
     private int $sessionLifetime = 0;
 
     /** @param array<string, mixed> $data */
-    public function __construct(array $data, string $id = '')
-    {
+    public function __construct(
+        array $data,
+        /**
+         * The session identifier, if any.
+         *
+         * This is present in the session to allow the session persistence
+         * implementation to be stateless. When present here, we can query for it
+         * when it is time to persist the session, instead of relying on state in
+         * the persistence instance (which may be shared between multiple
+         * requests).
+         */
+        private string $id = ''
+    ) {
         $this->data = $this->originalData = $data;
-        $this->id   = $id;
 
         /** @psalm-suppress MixedAssignment */
         $lifetime = $data[SessionCookiePersistenceInterface::SESSION_LIFETIME_KEY] ?? null;
