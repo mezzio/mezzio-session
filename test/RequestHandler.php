@@ -13,7 +13,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 final class RequestHandler implements RequestHandlerInterface
 {
     private ?ServerRequestInterface $received = null;
-    private ResponseInterface $defaultResponse;
+    private readonly ResponseInterface $defaultResponse;
 
     public function __construct(
         ResponseInterface|null $defaultResponse = null,
