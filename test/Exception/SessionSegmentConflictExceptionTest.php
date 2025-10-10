@@ -7,7 +7,7 @@ namespace MezzioTest\Session\Exception;
 use Mezzio\Session\Exception\SessionSegmentConflictException;
 use PHPUnit\Framework\TestCase;
 
-class SessionSegmentConflictExceptionTest extends TestCase
+final class SessionSegmentConflictExceptionTest extends TestCase
 {
     public function testWhenRetrieving(): void
     {

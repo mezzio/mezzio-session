@@ -20,7 +20,7 @@ use function gmdate;
 use function sprintf;
 use function time;
 
-class CacheHeadersGeneratorTraitTest extends TestCase
+final class CacheHeadersGeneratorTraitTest extends TestCase
 {
     public const GMDATE_REGEXP = '/^'
         . '(Sun|Mon|Tue|Wed|Thu|Fri|Sat), '

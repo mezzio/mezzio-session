@@ -7,7 +7,7 @@ namespace MezzioTest\Session\Exception;
 use Mezzio\Session\Exception\InvalidHopsValueException;
 use PHPUnit\Framework\TestCase;
 
-class InvalidHopsValueExceptionTest extends TestCase
+final class InvalidHopsValueExceptionTest extends TestCase
 {
     public function testExpectedMessageWhenHopsTooLow(): void
     {

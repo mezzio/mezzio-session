@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use ReflectionProperty;
 
-class SessionMiddlewareFactoryTest extends TestCase
+final class SessionMiddlewareFactoryTest extends TestCase
 {
     public function testFactoryProducesMiddlewareWithSessionPersistenceInterfaceService(): void
     {
