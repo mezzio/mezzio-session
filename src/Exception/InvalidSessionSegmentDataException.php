@@ -9,6 +9,7 @@ use RuntimeException;
 use function get_debug_type;
 use function sprintf;
 
+/** @final */
 class InvalidSessionSegmentDataException extends RuntimeException implements ExceptionInterface
 {
     /**
