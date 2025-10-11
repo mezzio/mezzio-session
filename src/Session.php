@@ -11,6 +11,7 @@ use function json_encode;
 
 use const JSON_PRESERVE_ZERO_FRACTION;
 
+/** @final */
 class Session implements
     SessionCookiePersistenceInterface,
     SessionIdentifierAwareInterface,

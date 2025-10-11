@@ -14,7 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
-class SessionMiddlewareTest extends TestCase
+final class SessionMiddlewareTest extends TestCase
 {
     private function getAttribute(object $instance, string $property): mixed
     {

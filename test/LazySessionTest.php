@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionProperty;
 
-class LazySessionTest extends TestCase
+final class LazySessionTest extends TestCase
 {
     /**
      * @var SessionInterface|MockObject
