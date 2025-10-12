@@ -68,4 +68,9 @@ interface SessionInterface
      * true if the instance was produced via regenerate().
      */
     public function isRegenerated(): bool;
+
+    /**
+     * Retrieve the session identifier.
+     */
+    public function getId(): string;
 }

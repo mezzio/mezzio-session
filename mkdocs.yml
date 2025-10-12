@@ -2,6 +2,13 @@ docs_dir: docs/book
 site_dir: docs/html
 nav:
     - Home: index.md
+    - v2:
+        - Introduction: v2/intro.md
+        - Installation: v2/installation.md
+        - Usage:
+            - "Session Containers": v2/session.md
+            - "Session Persistence": v2/persistence.md
+            - "Session Middleware": v2/middleware.md
     - v1:
         - Introduction: v1/intro.md
         - Installation: v1/installation.md
@@ -16,14 +23,15 @@ extra:
     project: Mezzio
     installation:
         config_provider_class: 'Mezzio\Session\ConfigProvider'
-    current_version: v1
+    current_version: v2
     versions:
+      - v2
       - v1
 plugins:
     - redirects:
         redirect_maps:
-            intro.md: v1/intro.md
-            installation.md: v1/installation.md
-            session.md: v1/session.md
-            persistence.md: v1/persistence.md
-            middleware.md: v1/middleware.md
+            intro.md: v2/intro.md
+            installation.md: v2/installation.md
+            session.md: v2/session.md
+            persistence.md: v2/persistence.md
+            middleware.md: v2/middleware.md
