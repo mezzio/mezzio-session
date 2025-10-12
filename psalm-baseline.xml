@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <files psalm-version="6.13.1@1e3b7f0a8ab32b23197b91107adc0a7ed8a05b51">
-  <file src="src/LazySession.php">
-    <DeprecatedInterface>
-      <code><![CDATA[LazySession]]></code>
-    </DeprecatedInterface>
-  </file>
   <file src="src/Persistence/CacheHeadersGeneratorTrait.php">
     <UnusedMethod>
       <code><![CDATA[generateCacheHeaders]]></code>
@@ -16,20 +11,12 @@
     </UnusedConstructor>
   </file>
   <file src="src/Session.php">
-    <DeprecatedInterface>
-      <code><![CDATA[Session]]></code>
-    </DeprecatedInterface>
     <MixedReturnStatement>
       <code><![CDATA[json_decode(json_encode($value, JSON_PRESERVE_ZERO_FRACTION), true)]]></code>
     </MixedReturnStatement>
     <PossiblyFalseArgument>
       <code><![CDATA[json_encode($value, JSON_PRESERVE_ZERO_FRACTION)]]></code>
     </PossiblyFalseArgument>
-  </file>
-  <file src="src/SessionPersistenceInterface.php">
-    <DeprecatedInterface>
-      <code><![CDATA[SessionInterface&SessionIdentifierAwareInterface]]></code>
-    </DeprecatedInterface>
   </file>
   <file src="test/SessionTest.php">
     <PossiblyFalseArgument>
