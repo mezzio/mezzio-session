@@ -8,6 +8,7 @@ use RuntimeException;
 
 use function sprintf;
 
+/** @final */
 class SessionSegmentConflictException extends RuntimeException implements ExceptionInterface
 {
     public static function whenRetrieving(string $name): self

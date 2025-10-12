@@ -20,7 +20,7 @@ use function method_exists;
 use function sprintf;
 use function urlencode;
 
-class SessionCookieAwareTraitTest extends TestCase
+final class SessionCookieAwareTraitTest extends TestCase
 {
     public const EXPIRE_REGEXP = '/'
         . 'Expires\='

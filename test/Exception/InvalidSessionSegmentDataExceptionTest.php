@@ -7,7 +7,7 @@ namespace MezzioTest\Session\Exception;
 use Mezzio\Session\Exception\InvalidSessionSegmentDataException;
 use PHPUnit\Framework\TestCase;
 
-class InvalidSessionSegmentDataExceptionTest extends TestCase
+final class InvalidSessionSegmentDataExceptionTest extends TestCase
 {
     public function testExpectedExceptionMessage(): void
     {

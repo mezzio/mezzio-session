@@ -16,7 +16,7 @@ use function json_encode;
 
 use const JSON_PRESERVE_ZERO_FRACTION;
 
-class SessionTest extends TestCase
+final class SessionTest extends TestCase
 {
     public function testImplementsSessionInterface(): void
     {

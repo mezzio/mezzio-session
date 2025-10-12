@@ -6,6 +6,8 @@ namespace Mezzio\Session\Persistence;
 
 /**
  * Provides commonly used HTTP related constants.
+ *
+ * @final
  */
 class Http
 {
