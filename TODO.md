@@ -50,7 +50,7 @@ applications — though likely no more confusing than learning which session
 
 - [x] Create a separate package for flash messages
 - [x] Introduce an interface just for flash message access and manipulation.
-  - [x] Rename `persistFlash()` to something more appropriate.
+    - [x] Rename `persistFlash()` to something more appropriate.
 - [x] Create middleware for creating the `Flash` instance and propagating it
   into the request delegated by the middleware.
 - [x] Externalize the flash message support to its own package
