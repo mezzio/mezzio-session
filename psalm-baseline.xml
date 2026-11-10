@@ -36,6 +36,23 @@
       <code><![CDATA[SessionInterface&SessionIdentifierAwareInterface]]></code>
     </DeprecatedInterface>
   </file>
+  <file src="test/Exception/InvalidHopsValueExceptionTest.php">
+    <DeprecatedClass>
+      <code><![CDATA[InvalidHopsValueException::valueTooLow('nuts', 99)]]></code>
+    </DeprecatedClass>
+  </file>
+  <file src="test/Exception/InvalidSessionSegmentDataExceptionTest.php">
+    <DeprecatedClass>
+      <code><![CDATA[InvalidSessionSegmentDataException::whenRetrieving('muppets', 'kermit')]]></code>
+    </DeprecatedClass>
+  </file>
+  <file src="test/Exception/SessionSegmentConflictExceptionTest.php">
+    <DeprecatedClass>
+      <code><![CDATA[SessionSegmentConflictException::whenDeleting('boo')]]></code>
+      <code><![CDATA[SessionSegmentConflictException::whenRetrieving('baz')]]></code>
+      <code><![CDATA[SessionSegmentConflictException::whenSetting('qoo')]]></code>
+    </DeprecatedClass>
+  </file>
   <file src="test/SessionTest.php">
     <PossiblyFalseArgument>
       <code><![CDATA[json_encode($data, JSON_PRESERVE_ZERO_FRACTION)]]></code>
