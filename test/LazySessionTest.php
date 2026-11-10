@@ -6,7 +6,7 @@ namespace MezzioTest\Session;
 
 use Mezzio\Session\Exception\NotInitializableException;
 use Mezzio\Session\LazySession;
-use Mezzio\Session\Session;
+use Mezzio\Session\SessionCookiePersistenceInterface;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionPersistenceInterface;
 use MezzioTest\Session\TestAsset\SessionInitializationPersistenceInterface;
@@ -17,24 +17,9 @@ use ReflectionProperty;
 
 final class LazySessionTest extends TestCase
 {
-    /**
-     * @var SessionInterface|MockObject
-     * @psalm-var SessionInterface&MockObject
-     */
-    private $proxy;
-
-    /**
-     * @var SessionPersistenceInterface|MockObject
-     * @psalm-var SessionPersistenceInterface&MockObject
-     */
-    private $persistence;
-
-    /**
-     * @var ServerRequestInterface|MockObject
-     * @psalm-var ServerRequestInterface&MockObject
-     */
-    private $request;
-
+    private SessionInterface&MockObject $proxy;
+    private SessionPersistenceInterface&MockObject $persistence;
+    private ServerRequestInterface&MockObject $request;
     private LazySession $session;
 
     public function setUp(): void
@@ -45,14 +30,10 @@ final class LazySessionTest extends TestCase
         $this->session     = new LazySession($this->persistence, $this->request);
     }
 
-    /**
-     * @param SessionPersistenceInterface|MockObject $persistence
-     * @param ServerRequestInterface|MockObject      $request
-     * @psalm-param SessionPersistenceInterface&MockObject $persistence
-     * @psalm-param ServerRequestInterface&MockObject      $request
-     */
-    public function assertProxyCreated($persistence, $request): void
-    {
+    public function assertProxyCreated(
+        SessionPersistenceInterface&MockObject $persistence,
+        ServerRequestInterface&MockObject $request,
+    ): void {
         $persistence
             ->method('initializeSessionFromRequest')
             ->with($request)
@@ -183,9 +164,9 @@ final class LazySessionTest extends TestCase
         $this->assertSame('', $this->session->getId());
     }
 
-    public function testGetIdReturnsValueFromProxyIfItImplementsIdentiferAwareInterface(): void
+    public function testGetIdReturnsValueFromProxyIfItImplementsIdentifierAwareInterface(): void
     {
-        $proxy = $this->createMock(Session::class);
+        $proxy = $this->createMock(SessionInterface::class);
         $proxy->method('getId')->willReturn('abcd1234');
         $this->persistence
             ->method('initializeSessionFromRequest')
@@ -209,7 +190,11 @@ final class LazySessionTest extends TestCase
 
     public function testPersistSessionForProxiesToUnderlyingSession(): void
     {
-        $proxy = $this->createMock(Session::class);
+        /** @var SessionInterface&SessionCookiePersistenceInterface&MockObject $proxy */
+        $proxy = $this->createMockForIntersectionOfInterfaces([
+            SessionInterface::class,
+            SessionCookiePersistenceInterface::class,
+        ]);
         $proxy->expects($this->once())->method('persistSessionFor')->with(60);
         $this->persistence
             ->method('initializeSessionFromRequest')
@@ -233,7 +218,11 @@ final class LazySessionTest extends TestCase
 
     public function testGetSessionLifetimeReturnsValueFromProxy(): void
     {
-        $proxy = $this->createMock(Session::class);
+        /** @var SessionInterface&SessionCookiePersistenceInterface&MockObject $proxy */
+        $proxy = $this->createMockForIntersectionOfInterfaces([
+            SessionInterface::class,
+            SessionCookiePersistenceInterface::class,
+        ]);
         $proxy->method('getSessionLifetime')->willReturn(60);
         $this->persistence->method('initializeSessionFromRequest')->with($this->request)->willReturn($proxy);
 
@@ -250,7 +239,11 @@ final class LazySessionTest extends TestCase
 
     public function testGenerateIdReturnsId(): void
     {
-        $newProxy = $this->createMock(Session::class);
+        /** @var SessionInterface&SessionCookiePersistenceInterface&MockObject $newProxy */
+        $newProxy = $this->createMockForIntersectionOfInterfaces([
+            SessionInterface::class,
+            SessionCookiePersistenceInterface::class,
+        ]);
         $newProxy->method('getId')->willReturn('generated-id');
         $proxy = $newProxy;
 
