@@ -8,7 +8,11 @@ use InvalidArgumentException;
 
 use function sprintf;
 
-/** @final */
+/**
+ * @deprecated This type is unused and will be removed in 2.0.0
+ *
+ * @final
+ */
 class InvalidHopsValueException extends InvalidArgumentException implements ExceptionInterface
 {
     public static function valueTooLow(string $key, int $hops): self

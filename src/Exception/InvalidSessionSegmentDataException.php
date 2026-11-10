@@ -9,7 +9,11 @@ use RuntimeException;
 use function get_debug_type;
 use function sprintf;
 
-/** @final */
+/**
+ * @deprecated This type is unused and will be removed in 2.0.0
+ *
+ * @final
+ */
 class InvalidSessionSegmentDataException extends RuntimeException implements ExceptionInterface
 {
     /**
