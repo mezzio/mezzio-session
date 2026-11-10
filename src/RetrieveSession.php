@@ -7,7 +7,7 @@ namespace Mezzio\Session;
 use Mezzio\Session\Exception\SessionNotInitializedException;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class RetrieveSession
+final readonly class RetrieveSession
 {
     private function __construct()
     {

@@ -6,10 +6,8 @@ namespace Mezzio\Session\Persistence;
 
 /**
  * Provides commonly used HTTP related constants.
- *
- * @final
  */
-class Http
+final readonly class Http
 {
     /**
      * HTTP date format to be used in `gmdate` calls for creating valid header
@@ -18,12 +16,12 @@ class Http
      * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Date
      * @see https://tools.ietf.org/html/rfc7231#section-7.1.1.2
      */
-    public const DATE_FORMAT = 'D, d M Y H:i:s T';
+    public const string DATE_FORMAT = 'D, d M Y H:i:s T';
 
     /**
      * The header formatted version of the Unix Epoch for generic past-date.
      */
-    public const UNIX_EPOCH = 'Thu, 01 Jan 1970 00:00:00 GMT';
+    public const string UNIX_EPOCH = 'Thu, 01 Jan 1970 00:00:00 GMT';
 
     /**
      * This unusual past date value is taken from the php-engine source code and
@@ -31,5 +29,5 @@ class Http
      *
      * @see https://github.com/php/php-src/blob/php-7.4.4/ext/session/session.c#L1193
      */
-    public const CACHE_PAST_DATE = 'Thu, 19 Nov 1981 08:52:00 GMT';
+    public const string CACHE_PAST_DATE = 'Thu, 19 Nov 1981 08:52:00 GMT';
 }

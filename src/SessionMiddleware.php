@@ -9,10 +9,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
-/** @final */
-class SessionMiddleware implements MiddlewareInterface
+final class SessionMiddleware implements MiddlewareInterface
 {
-    public const SESSION_ATTRIBUTE = 'session';
+    public const string SESSION_ATTRIBUTE = 'session';
 
     public function __construct(private readonly SessionPersistenceInterface $persistence)
     {

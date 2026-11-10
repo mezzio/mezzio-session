@@ -8,8 +8,7 @@ use InvalidArgumentException;
 
 use function sprintf;
 
-/** @final */
-class InvalidHopsValueException extends InvalidArgumentException implements ExceptionInterface
+final class InvalidHopsValueException extends InvalidArgumentException implements ExceptionInterface
 {
     public static function valueTooLow(string $key, int $hops): self
     {

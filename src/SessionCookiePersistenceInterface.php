@@ -25,7 +25,7 @@ namespace Mezzio\Session;
  */
 interface SessionCookiePersistenceInterface
 {
-    public const SESSION_LIFETIME_KEY = '__SESSION_TTL__';
+    public const string SESSION_LIFETIME_KEY = '__SESSION_TTL__';
 
     /**
      * Define how long the session cookie should live.

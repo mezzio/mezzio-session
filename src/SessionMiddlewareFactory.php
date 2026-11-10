@@ -6,8 +6,7 @@ namespace Mezzio\Session;
 
 use Psr\Container\ContainerInterface;
 
-/** @final */
-class SessionMiddlewareFactory
+final readonly class SessionMiddlewareFactory
 {
     public function __invoke(ContainerInterface $container): SessionMiddleware
     {
