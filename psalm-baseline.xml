@@ -18,11 +18,6 @@
       <code><![CDATA[json_encode($value, JSON_PRESERVE_ZERO_FRACTION)]]></code>
     </PossiblyFalseArgument>
   </file>
-  <file src="src/SessionCookiePersistenceInterface.php">
-    <MissingClassConstType>
-      <code><![CDATA[SESSION_LIFETIME_KEY = '__SESSION_TTL__']]></code>
-    </MissingClassConstType>
-  </file>
   <file src="test/SessionTest.php">
     <PossiblyFalseArgument>
       <code><![CDATA[json_encode($data, JSON_PRESERVE_ZERO_FRACTION)]]></code>
